@@ -314,7 +314,7 @@ function Apply() {
                 style={{ backgroundColor: "#E5F6EC", color: "#1E7E45" }}
               >
                 <CheckCircle2 size={18} />
-                Application submitted successfully! We'll notify you after review.
+                Aapki application submit ho gayi! Notification mein update milegi.
               </div>
             )}
 
