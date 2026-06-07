@@ -347,11 +347,20 @@ function Apply() {
                 />
                 <button
                   onClick={() => fileRef.current?.click()}
-                  disabled={submitted}
+                  disabled={submitted || uploading}
                   aria-label="Attach image"
-                  className="rounded-full p-2 text-[#8B2252] hover:bg-[#F6E8F0] disabled:opacity-40"
+                  className="flex items-center gap-1 rounded-full px-2 py-2 text-[#8B2252] hover:bg-[#F6E8F0] disabled:opacity-40"
                 >
                   <Paperclip size={20} />
+                  {uploading ? (
+                    <span className="text-xs font-medium">uploading…</span>
+                  ) : (
+                    uploadedImageUrls.length > 0 && (
+                      <span className="text-xs font-medium">
+                        📎 {uploadedImageUrls.length} uploaded
+                      </span>
+                    )
+                  )}
                 </button>
                 <button
                   onClick={startListening}
