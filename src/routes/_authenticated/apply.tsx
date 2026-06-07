@@ -47,8 +47,9 @@ function Apply() {
     { role: "assistant", content: GREETING[lang] ?? GREETING.en },
   ]);
   const [input, setInput] = useState("");
-  const [pendingUploads, setPendingUploads] = useState<File[]>([]);
+  const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [sending, setSending] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [listening, setListening] = useState(false);
@@ -77,16 +78,36 @@ function Apply() {
     },
   });
 
-  const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
-    if (files.length === 0) return;
-    setPendingUploads((prev) => [...prev, ...files]);
-    setPreviews((prev) => [...prev, ...files.map((f) => URL.createObjectURL(f))]);
     if (fileRef.current) fileRef.current.value = "";
+    if (files.length === 0) return;
+    if (!userId) {
+      toast.error("Please sign in again.");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      for (const f of files) {
+        const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}-${f.name}`;
+        const { error } = await supabase.storage
+          .from("portfolio-images")
+          .upload(path, f);
+        if (error) {
+          toast.error("Could not upload an image. Please try again.");
+          continue;
+        }
+        setUploadedImageUrls((prev) => [...prev, path]);
+        setPreviews((prev) => [...prev, URL.createObjectURL(f)]);
+      }
+    } finally {
+      setUploading(false);
+    }
   };
 
   const removeUpload = (idx: number) => {
-    setPendingUploads((prev) => prev.filter((_, i) => i !== idx));
+    setUploadedImageUrls((prev) => prev.filter((_, i) => i !== idx));
     setPreviews((prev) => prev.filter((_, i) => i !== idx));
   };
 
@@ -114,10 +135,35 @@ function Apply() {
     recognition.start();
   };
 
+  const isComplete = (c: any) =>
+    !!c &&
+    c.skill != null &&
+    c.full_name != null &&
+    c.age != null &&
+    c.education != null &&
+    c.experience != null &&
+    c.cnic_number != null;
+
+  const finalizeSubmission = async (history: ChatMsg[]) => {
+    const res = await callGrok({
+      data: {
+        messages: history.map((m) => ({ role: m.role, content: m.content })),
+        image_urls: uploadedImageUrls,
+        forceSubmit: true,
+        lang,
+      },
+    });
+    setMessages((prev) => [...prev, { role: "assistant", content: res.reply }]);
+    if (res.applicationSubmitted) {
+      setSubmitted(true);
+      refetch();
+    }
+  };
+
   const send = async () => {
-    if (sending || submitted) return;
+    if (sending || submitted || uploading) return;
     const text = input.trim();
-    if (!text && pendingUploads.length === 0) return;
+    if (!text && uploadedImageUrls.length === 0) return;
     if (!userId) {
       toast.error("Please sign in again.");
       return;
@@ -125,34 +171,31 @@ function Apply() {
 
     setSending(true);
     const sentPreviews = [...previews];
-    const filesToUpload = [...pendingUploads];
 
     // Optimistically render the user message.
     const userMsg: ChatMsg = { role: "user", content: text, thumbs: sentPreviews };
     const nextMessages = [...messages, userMsg];
     setMessages(nextMessages);
     setInput("");
-    setPendingUploads([]);
-    setPreviews([]);
 
     try {
-      // Upload images to storage and collect their paths.
-      const imagePaths: string[] = [];
-      for (const f of filesToUpload) {
-        const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}-${f.name}`;
-        const { error } = await supabase.storage.from("work-proofs").upload(path, f);
-        if (!error) imagePaths.push(path);
-      }
-
       const history = nextMessages.map((m) => ({ role: m.role, content: m.content }));
       const res = await callGrok({
-        data: { messages: history, image_paths: imagePaths, lang },
+        data: { messages: history, image_urls: uploadedImageUrls, lang },
       });
 
-      setMessages((prev) => [...prev, { role: "assistant", content: res.reply }]);
+      const replyMsg: ChatMsg = { role: "assistant", content: res.reply };
+      setMessages((prev) => [...prev, replyMsg]);
+
       if (res.applicationSubmitted) {
         setSubmitted(true);
         refetch();
+        return;
+      }
+
+      // Auto-submit once enough images and all details are collected.
+      if (uploadedImageUrls.length >= 3 && isComplete(res.collected)) {
+        await finalizeSubmission([...nextMessages, replyMsg]);
       }
     } catch {
       setMessages((prev) => [
@@ -271,7 +314,7 @@ function Apply() {
                 style={{ backgroundColor: "#E5F6EC", color: "#1E7E45" }}
               >
                 <CheckCircle2 size={18} />
-                Application submitted successfully! We'll notify you after review.
+                Aapki application submit ho gayi! Notification mein update milegi.
               </div>
             )}
 
@@ -304,11 +347,20 @@ function Apply() {
                 />
                 <button
                   onClick={() => fileRef.current?.click()}
-                  disabled={submitted}
+                  disabled={submitted || uploading}
                   aria-label="Attach image"
-                  className="rounded-full p-2 text-[#8B2252] hover:bg-[#F6E8F0] disabled:opacity-40"
+                  className="flex items-center gap-1 rounded-full px-2 py-2 text-[#8B2252] hover:bg-[#F6E8F0] disabled:opacity-40"
                 >
                   <Paperclip size={20} />
+                  {uploading ? (
+                    <span className="text-xs font-medium">uploading…</span>
+                  ) : (
+                    uploadedImageUrls.length > 0 && (
+                      <span className="text-xs font-medium">
+                        📎 {uploadedImageUrls.length} uploaded
+                      </span>
+                    )
+                  )}
                 </button>
                 <button
                   onClick={startListening}
@@ -330,7 +382,7 @@ function Apply() {
                 />
                 <button
                   onClick={send}
-                  disabled={sending || submitted}
+                  disabled={sending || submitted || uploading}
                   aria-label="Send"
                   className="rounded-full p-2.5 text-white disabled:opacity-40"
                   style={{ backgroundColor: "#C2587A" }}
