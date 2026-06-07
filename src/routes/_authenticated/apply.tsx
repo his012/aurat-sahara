@@ -47,8 +47,9 @@ function Apply() {
     { role: "assistant", content: GREETING[lang] ?? GREETING.en },
   ]);
   const [input, setInput] = useState("");
-  const [pendingUploads, setPendingUploads] = useState<File[]>([]);
+  const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [sending, setSending] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [listening, setListening] = useState(false);
