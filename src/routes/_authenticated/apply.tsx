@@ -382,7 +382,7 @@ function Apply() {
                 />
                 <button
                   onClick={send}
-                  disabled={sending || submitted}
+                  disabled={sending || submitted || uploading}
                   aria-label="Send"
                   className="rounded-full p-2.5 text-white disabled:opacity-40"
                   style={{ backgroundColor: "#C2587A" }}
