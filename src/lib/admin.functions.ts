@@ -104,6 +104,7 @@ export const adminAction = createServerFn({ method: "POST" })
       title,
       body,
       type: newStatus,
+      request_id: row.id,
     });
 
     return { ok: true };
