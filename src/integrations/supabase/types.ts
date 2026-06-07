@@ -59,12 +59,57 @@ export type Database = {
         }
         Relationships: []
       }
+      certificates: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          issue_date: string
+          request_id: string
+          skill: string | null
+          updated_at: string
+          user_id: string
+          uuid_verify: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          issue_date?: string
+          request_id: string
+          skill?: string | null
+          updated_at?: string
+          user_id: string
+          uuid_verify?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          issue_date?: string
+          request_id?: string
+          skill?: string | null
+          updated_at?: string
+          user_id?: string
+          uuid_verify?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificates_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "certificate_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           body: string | null
           created_at: string
           id: string
           is_read: boolean
+          request_id: string | null
           title: string
           type: string
           user_id: string
@@ -74,6 +119,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_read?: boolean
+          request_id?: string | null
           title: string
           type?: string
           user_id: string
@@ -83,11 +129,20 @@ export type Database = {
           created_at?: string
           id?: string
           is_read?: boolean
+          request_id?: string | null
           title?: string
           type?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "notifications_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "certificate_requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

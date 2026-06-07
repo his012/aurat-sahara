@@ -13,6 +13,9 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VerifyUuidRouteImport } from './routes/verify.$uuid'
+import { Route as CertificateIdRouteImport } from './routes/certificate.$id'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedApplyRouteImport } from './routes/_authenticated/apply'
 
@@ -35,6 +38,22 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VerifyUuidRoute = VerifyUuidRouteImport.update({
+  id: '/verify/$uuid',
+  path: '/verify/$uuid',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CertificateIdRoute = CertificateIdRouteImport.update({
+  id: '/certificate/$id',
+  path: '/certificate/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedHomeRoute = AuthenticatedHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -52,6 +71,9 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/apply': typeof AuthenticatedApplyRoute
   '/home': typeof AuthenticatedHomeRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
+  '/certificate/$id': typeof CertificateIdRoute
+  '/verify/$uuid': typeof VerifyUuidRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -59,6 +81,9 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/apply': typeof AuthenticatedApplyRoute
   '/home': typeof AuthenticatedHomeRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
+  '/certificate/$id': typeof CertificateIdRoute
+  '/verify/$uuid': typeof VerifyUuidRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,12 +93,31 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/apply': typeof AuthenticatedApplyRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/certificate/$id': typeof CertificateIdRoute
+  '/verify/$uuid': typeof VerifyUuidRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/auth' | '/apply' | '/home'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/apply'
+    | '/home'
+    | '/notifications'
+    | '/certificate/$id'
+    | '/verify/$uuid'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/auth' | '/apply' | '/home'
+  to:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/apply'
+    | '/home'
+    | '/notifications'
+    | '/certificate/$id'
+    | '/verify/$uuid'
   id:
     | '__root__'
     | '/'
@@ -82,6 +126,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/apply'
     | '/_authenticated/home'
+    | '/_authenticated/notifications'
+    | '/certificate/$id'
+    | '/verify/$uuid'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -89,6 +136,8 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
+  CertificateIdRoute: typeof CertificateIdRoute
+  VerifyUuidRoute: typeof VerifyUuidRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -121,6 +170,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/verify/$uuid': {
+      id: '/verify/$uuid'
+      path: '/verify/$uuid'
+      fullPath: '/verify/$uuid'
+      preLoaderRoute: typeof VerifyUuidRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/certificate/$id': {
+      id: '/certificate/$id'
+      path: '/certificate/$id'
+      fullPath: '/certificate/$id'
+      preLoaderRoute: typeof CertificateIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/home': {
       id: '/_authenticated/home'
       path: '/home'
@@ -141,11 +211,13 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedApplyRoute: typeof AuthenticatedApplyRoute
   AuthenticatedHomeRoute: typeof AuthenticatedHomeRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedApplyRoute: AuthenticatedApplyRoute,
   AuthenticatedHomeRoute: AuthenticatedHomeRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -156,6 +228,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
+  CertificateIdRoute: CertificateIdRoute,
+  VerifyUuidRoute: VerifyUuidRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

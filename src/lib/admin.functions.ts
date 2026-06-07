@@ -58,7 +58,7 @@ export const adminAction = createServerFn({ method: "POST" })
 
     const { data: row, error: fetchErr } = await supabaseAdmin
       .from("certificate_requests")
-      .select("id, user_id, skill")
+      .select("id, user_id, skill, full_name")
       .eq("id", data.request_id)
       .single();
 
@@ -73,6 +73,24 @@ export const adminAction = createServerFn({ method: "POST" })
 
     if (updateErr) return { ok: false, error: "Could not update the request." };
 
+    // On approval, issue a certificate (idempotent via unique request_id index)
+    if (newStatus === "approved") {
+      const { data: existing } = await supabaseAdmin
+        .from("certificates")
+        .select("id")
+        .eq("request_id", row.id)
+        .maybeSingle();
+
+      if (!existing) {
+        await supabaseAdmin.from("certificates").insert({
+          request_id: row.id,
+          user_id: row.user_id,
+          full_name: row.full_name,
+          skill: row.skill,
+        });
+      }
+    }
+
     const skill = row.skill ?? "your skill";
     const title =
       newStatus === "approved" ? "Application approved ✓" : "Application declined";
@@ -86,6 +104,7 @@ export const adminAction = createServerFn({ method: "POST" })
       title,
       body,
       type: newStatus,
+      request_id: row.id,
     });
 
     return { ok: true };

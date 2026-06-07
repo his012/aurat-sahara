@@ -69,7 +69,7 @@ function Home() {
 
         <button
           aria-label="Notifications"
-          onClick={() => navigate({ to: "/home" })}
+          onClick={() => navigate({ to: "/notifications" })}
           className="relative rounded-full p-2 text-[#8B2252] transition-colors hover:bg-[#F0E3EC]"
         >
           <Bell size={22} />
