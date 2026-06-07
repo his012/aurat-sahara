@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      certificate_requests: {
+        Row: {
+          age: number | null
+          city: string | null
+          cnic_number: string | null
+          comment: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          skill: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          work_proof_urls: string[]
+        }
+        Insert: {
+          age?: number | null
+          city?: string | null
+          cnic_number?: string | null
+          comment?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          skill?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          work_proof_urls?: string[]
+        }
+        Update: {
+          age?: number | null
+          city?: string | null
+          cnic_number?: string | null
+          comment?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          skill?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          work_proof_urls?: string[]
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string | null
