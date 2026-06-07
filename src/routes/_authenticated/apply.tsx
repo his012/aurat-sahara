@@ -135,10 +135,35 @@ function Apply() {
     recognition.start();
   };
 
+  const isComplete = (c: any) =>
+    !!c &&
+    c.skill != null &&
+    c.full_name != null &&
+    c.age != null &&
+    c.education != null &&
+    c.experience != null &&
+    c.cnic_number != null;
+
+  const finalizeSubmission = async (history: ChatMsg[]) => {
+    const res = await callGrok({
+      data: {
+        messages: history.map((m) => ({ role: m.role, content: m.content })),
+        image_urls: uploadedImageUrls,
+        forceSubmit: true,
+        lang,
+      },
+    });
+    setMessages((prev) => [...prev, { role: "assistant", content: res.reply }]);
+    if (res.applicationSubmitted) {
+      setSubmitted(true);
+      refetch();
+    }
+  };
+
   const send = async () => {
-    if (sending || submitted) return;
+    if (sending || submitted || uploading) return;
     const text = input.trim();
-    if (!text && pendingUploads.length === 0) return;
+    if (!text && uploadedImageUrls.length === 0) return;
     if (!userId) {
       toast.error("Please sign in again.");
       return;
@@ -146,34 +171,31 @@ function Apply() {
 
     setSending(true);
     const sentPreviews = [...previews];
-    const filesToUpload = [...pendingUploads];
 
     // Optimistically render the user message.
     const userMsg: ChatMsg = { role: "user", content: text, thumbs: sentPreviews };
     const nextMessages = [...messages, userMsg];
     setMessages(nextMessages);
     setInput("");
-    setPendingUploads([]);
-    setPreviews([]);
 
     try {
-      // Upload images to storage and collect their paths.
-      const imagePaths: string[] = [];
-      for (const f of filesToUpload) {
-        const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}-${f.name}`;
-        const { error } = await supabase.storage.from("work-proofs").upload(path, f);
-        if (!error) imagePaths.push(path);
-      }
-
       const history = nextMessages.map((m) => ({ role: m.role, content: m.content }));
       const res = await callGrok({
-        data: { messages: history, image_paths: imagePaths, lang },
+        data: { messages: history, image_urls: uploadedImageUrls, lang },
       });
 
-      setMessages((prev) => [...prev, { role: "assistant", content: res.reply }]);
+      const replyMsg: ChatMsg = { role: "assistant", content: res.reply };
+      setMessages((prev) => [...prev, replyMsg]);
+
       if (res.applicationSubmitted) {
         setSubmitted(true);
         refetch();
+        return;
+      }
+
+      // Auto-submit once enough images and all details are collected.
+      if (uploadedImageUrls.length >= 3 && isComplete(res.collected)) {
+        await finalizeSubmission([...nextMessages, replyMsg]);
       }
     } catch {
       setMessages((prev) => [
