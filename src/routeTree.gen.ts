@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VerifyUuidRouteImport } from './routes/verify.$uuid'
 import { Route as CertificateIdRouteImport } from './routes/certificate.$id'
 import { Route as AuthenticatedHomeRouteImport } from './routes/_authenticated/home'
 import { Route as AuthenticatedApplyRouteImport } from './routes/_authenticated/apply'
@@ -34,6 +35,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyUuidRoute = VerifyUuidRouteImport.update({
+  id: '/verify/$uuid',
+  path: '/verify/$uuid',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CertificateIdRoute = CertificateIdRouteImport.update({
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/apply': typeof AuthenticatedApplyRoute
   '/home': typeof AuthenticatedHomeRoute
   '/certificate/$id': typeof CertificateIdRoute
+  '/verify/$uuid': typeof VerifyUuidRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/apply': typeof AuthenticatedApplyRoute
   '/home': typeof AuthenticatedHomeRoute
   '/certificate/$id': typeof CertificateIdRoute
+  '/verify/$uuid': typeof VerifyUuidRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,12 +85,27 @@ export interface FileRoutesById {
   '/_authenticated/apply': typeof AuthenticatedApplyRoute
   '/_authenticated/home': typeof AuthenticatedHomeRoute
   '/certificate/$id': typeof CertificateIdRoute
+  '/verify/$uuid': typeof VerifyUuidRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/auth' | '/apply' | '/home' | '/certificate/$id'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/apply'
+    | '/home'
+    | '/certificate/$id'
+    | '/verify/$uuid'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/auth' | '/apply' | '/home' | '/certificate/$id'
+  to:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/apply'
+    | '/home'
+    | '/certificate/$id'
+    | '/verify/$uuid'
   id:
     | '__root__'
     | '/'
@@ -92,6 +115,7 @@ export interface FileRouteTypes {
     | '/_authenticated/apply'
     | '/_authenticated/home'
     | '/certificate/$id'
+    | '/verify/$uuid'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -100,6 +124,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   CertificateIdRoute: typeof CertificateIdRoute
+  VerifyUuidRoute: typeof VerifyUuidRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -130,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify/$uuid': {
+      id: '/verify/$uuid'
+      path: '/verify/$uuid'
+      fullPath: '/verify/$uuid'
+      preLoaderRoute: typeof VerifyUuidRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/certificate/$id': {
@@ -175,6 +207,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   CertificateIdRoute: CertificateIdRoute,
+  VerifyUuidRoute: VerifyUuidRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
