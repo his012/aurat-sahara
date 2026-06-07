@@ -5,8 +5,18 @@ type ChatMessage = { role: "user" | "assistant"; content: string };
 
 type GrokInput = {
   messages: ChatMessage[];
-  image_paths?: string[];
+  image_urls?: string[];
+  forceSubmit?: boolean;
   lang?: string;
+};
+
+type Collected = {
+  skill: string | null;
+  full_name: string | null;
+  age: number | null;
+  education: string | null;
+  experience: string | null;
+  cnic_number: string | null;
 };
 
 const LANG_INSTRUCTION: Record<string, string> = {
@@ -16,11 +26,84 @@ const LANG_INSTRUCTION: Record<string, string> = {
 };
 
 const SUCCESS_MSG: Record<string, string> = {
-  ur: "شکریہ! آپ کی درخواست جمع ہو گئی ہے۔ ہم جلد جائزہ لے کر آپ کو مطلع کریں گے۔",
-  roman:
-    "Shukriya! Aap ki application jama ho gayi hai. Hum jald review kar ke aap ko notification bhej denge.",
-  en: "Thank you! Your application has been submitted. We'll review it and notify you soon.",
+  ur: "آپ کی درخواست جمع ہو گئی! نوٹیفیکیشن میں اپڈیٹ ملے گی۔",
+  roman: "Aapki application submit ho gayi! Notification mein update milegi.",
+  en: "Your application has been submitted! You'll get an update in notifications.",
 };
+
+const AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+
+const EXTRACT_TOOL = {
+  type: "function",
+  function: {
+    name: "report_collected",
+    description:
+      "Report which application details have been collected so far from the conversation. Use null for anything not yet clearly provided by the user.",
+    parameters: {
+      type: "object",
+      properties: {
+        skill: { type: ["string", "null"] },
+        full_name: { type: ["string", "null"] },
+        age: { type: ["integer", "null"] },
+        education: { type: ["string", "null"] },
+        experience: { type: ["string", "null"] },
+        cnic_number: { type: ["string", "null"] },
+      },
+      required: [],
+    },
+  },
+};
+
+async function extractCollected(
+  apiKey: string,
+  messages: ChatMessage[],
+): Promise<Collected> {
+  const empty: Collected = {
+    skill: null,
+    full_name: null,
+    age: null,
+    education: null,
+    experience: null,
+    cnic_number: null,
+  };
+  try {
+    const res = await fetch(AI_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          {
+            role: "system",
+            content:
+              "Extract the certificate application details the user has provided so far. Call report_collected with whatever is known, using null for missing items.",
+          },
+          ...messages.map((m) => ({ role: m.role, content: m.content })),
+        ],
+        tools: [EXTRACT_TOOL],
+        tool_choice: { type: "function", function: { name: "report_collected" } },
+      }),
+    });
+    if (!res.ok) return empty;
+    const json = await res.json();
+    const args = json.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
+    if (!args) return empty;
+    const parsed = JSON.parse(args);
+    return {
+      skill: parsed.skill ?? null,
+      full_name: parsed.full_name ?? null,
+      age: parsed.age != null ? Number(parsed.age) : null,
+      education: parsed.education ?? null,
+      experience: parsed.experience ?? null,
+      cnic_number: parsed.cnic_number ?? null,
+    };
+  } catch {
+    return empty;
+  }
+}
 
 export const grokChat = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -28,40 +111,106 @@ export const grokChat = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const lang = data.lang ?? "en";
+    const imageUrls = data.image_urls ?? [];
     const apiKey = process.env.LOVABLE_API_KEY;
+
+    const noCollected: Collected = {
+      skill: null,
+      full_name: null,
+      age: null,
+      education: null,
+      experience: null,
+      cnic_number: null,
+    };
+
     if (!apiKey) {
-      return { reply: "AI service is not configured.", applicationSubmitted: false };
+      return {
+        reply: "AI service is not configured.",
+        applicationSubmitted: false,
+        collected: noCollected,
+      };
     }
 
-    // Generate signed URLs for any uploaded image paths so the model can see them.
-    const imageUrls: string[] = [];
-    for (const path of data.image_paths ?? []) {
+    // Resolve any storage paths into signed URLs the model can read.
+    const resolvedImageUrls: string[] = [];
+    for (const ref of imageUrls) {
+      if (/^https?:\/\//i.test(ref)) {
+        resolvedImageUrls.push(ref);
+        continue;
+      }
       const { data: signed } = await supabase.storage
-        .from("work-proofs")
-        .createSignedUrl(path, 60 * 30);
-      if (signed?.signedUrl) imageUrls.push(signed.signedUrl);
+        .from("portfolio-images")
+        .createSignedUrl(ref, 60 * 30);
+      if (signed?.signedUrl) resolvedImageUrls.push(signed.signedUrl);
     }
 
+    // ---- Force submit path ----
+    if (data.forceSubmit) {
+      const collected = await extractCollected(apiKey, data.messages);
+
+      const { supabaseAdmin } = await import(
+        "@/integrations/supabase/client.server"
+      );
+
+      const { error } = await supabaseAdmin.from("certificate_requests").insert({
+        user_id: userId,
+        full_name: collected.full_name,
+        skill: collected.skill,
+        age: collected.age,
+        education: collected.education,
+        experience: collected.experience,
+        cnic_number: collected.cnic_number,
+        work_proof_urls: imageUrls,
+        status: "pending",
+      });
+
+      if (error) {
+        return {
+          reply: "I couldn't save your application. Please try again.",
+          applicationSubmitted: false,
+          collected,
+        };
+      }
+
+      await supabaseAdmin.from("notifications").insert({
+        user_id: userId,
+        title: "Application received",
+        body: `Your certificate request for "${collected.skill ?? "your skill"}" is under review.`,
+        type: "info",
+      });
+
+      return {
+        reply: SUCCESS_MSG[lang] ?? SUCCESS_MSG.en,
+        applicationSubmitted: true,
+        collected,
+      };
+    }
+
+    // ---- Normal conversational path ----
     const system = `You are "Aurat Sahara AI", a warm, respectful assistant that helps women in Pakistan apply for a skill certificate.
 ${LANG_INSTRUCTION[lang] ?? LANG_INSTRUCTION.en}
 Collect these details ONE question at a time, in a friendly conversational way:
 1. skill (the skill they want a certificate for)
 2. full_name
 3. age
-4. city
-5. cnic_number (13 digit Pakistani CNIC)
-Also ask them to attach at least one photo as proof of their work.
-When you have ALL five details AND the user has attached at least one work-proof image, call the submit_application tool. Do not call it before you have everything. Keep messages short and encouraging.`;
+4. education
+5. experience (their work experience with this skill)
+6. cnic_number (13 digit Pakistani CNIC)
+Also ask them to attach at least 3 photos as proof of their work.
+Keep messages short and encouraging. Do NOT claim the application is submitted yourself — the system handles submission automatically once everything is ready.`;
 
     const chatMessages: any[] = [{ role: "system", content: system }];
     data.messages.forEach((m, idx) => {
       const isLast = idx === data.messages.length - 1;
-      if (isLast && m.role === "user" && imageUrls.length > 0) {
+      if (isLast && m.role === "user" && resolvedImageUrls.length > 0) {
         chatMessages.push({
           role: "user",
           content: [
             { type: "text", text: m.content || "Here are my work proof images." },
-            ...imageUrls.map((url) => ({ type: "image_url", image_url: { url } })),
+            ...resolvedImageUrls.map((url) => ({
+              type: "image_url",
+              image_url: { url },
+            })),
           ],
         });
       } else {
@@ -69,31 +218,9 @@ When you have ALL five details AND the user has attached at least one work-proof
       }
     });
 
-    const tools = [
-      {
-        type: "function",
-        function: {
-          name: "submit_application",
-          description:
-            "Submit the certificate application once skill, full_name, age, city, cnic_number are known and at least one work proof image was attached.",
-          parameters: {
-            type: "object",
-            properties: {
-              full_name: { type: "string" },
-              skill: { type: "string" },
-              age: { type: "integer" },
-              city: { type: "string" },
-              cnic_number: { type: "string" },
-            },
-            required: ["full_name", "skill", "age", "city", "cnic_number"],
-          },
-        },
-      },
-    ];
-
     let res: Response;
     try {
-      res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      res = await fetch(AI_URL, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
@@ -102,66 +229,46 @@ When you have ALL five details AND the user has attached at least one work-proof
         body: JSON.stringify({
           model: "google/gemini-2.5-flash",
           messages: chatMessages,
-          tools,
-          tool_choice: "auto",
         }),
       });
     } catch {
-      return { reply: "Network error contacting AI. Please try again.", applicationSubmitted: false };
+      return {
+        reply: "Network error contacting AI. Please try again.",
+        applicationSubmitted: false,
+        collected: noCollected,
+      };
     }
 
     if (res.status === 429) {
-      return { reply: "Too many requests right now. Please try again in a moment.", applicationSubmitted: false };
+      return {
+        reply: "Too many requests right now. Please try again in a moment.",
+        applicationSubmitted: false,
+        collected: noCollected,
+      };
     }
     if (res.status === 402) {
-      return { reply: "AI credits are exhausted. Please contact the administrator.", applicationSubmitted: false };
+      return {
+        reply: "AI credits are exhausted. Please contact the administrator.",
+        applicationSubmitted: false,
+        collected: noCollected,
+      };
     }
     if (!res.ok) {
-      return { reply: "Sorry, something went wrong with the AI. Please try again.", applicationSubmitted: false };
+      return {
+        reply: "Sorry, something went wrong with the AI. Please try again.",
+        applicationSubmitted: false,
+        collected: noCollected,
+      };
     }
 
     const json = await res.json();
-    const message = json.choices?.[0]?.message;
-    const toolCall = message?.tool_calls?.[0];
+    const reply = json.choices?.[0]?.message?.content ?? "...";
 
-    if (toolCall?.function?.name === "submit_application") {
-      let args: Record<string, unknown> = {};
-      try {
-        args = JSON.parse(toolCall.function.arguments ?? "{}");
-      } catch {
-        args = {};
-      }
+    // Track progress so the client knows when to auto-submit.
+    const collected = await extractCollected(apiKey, [
+      ...data.messages,
+      { role: "assistant", content: reply },
+    ]);
 
-      const { error } = await supabase.from("certificate_requests").insert({
-        user_id: userId,
-        full_name: (args.full_name as string) ?? null,
-        skill: (args.skill as string) ?? null,
-        age: args.age != null ? Number(args.age) : null,
-        city: (args.city as string) ?? null,
-        cnic_number: (args.cnic_number as string) ?? null,
-        work_proof_urls: data.image_paths ?? [],
-        status: "pending",
-      });
-
-      if (error) {
-        return {
-          reply: "I couldn't save your application. Please try again.",
-          applicationSubmitted: false,
-        };
-      }
-
-      await supabase.from("notifications").insert({
-        user_id: userId,
-        title: "Application received",
-        body: `Your certificate request for "${args.skill ?? "your skill"}" is under review.`,
-        type: "info",
-      });
-
-      return { reply: SUCCESS_MSG[lang] ?? SUCCESS_MSG.en, applicationSubmitted: true };
-    }
-
-    return {
-      reply: message?.content ?? "...",
-      applicationSubmitted: false,
-    };
+    return { reply, applicationSubmitted: false, collected };
   });
