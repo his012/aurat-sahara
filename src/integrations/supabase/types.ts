@@ -21,6 +21,8 @@ export type Database = {
           cnic_number: string | null
           comment: string | null
           created_at: string
+          education: string | null
+          experience: string | null
           full_name: string | null
           id: string
           skill: string | null
@@ -35,6 +37,8 @@ export type Database = {
           cnic_number?: string | null
           comment?: string | null
           created_at?: string
+          education?: string | null
+          experience?: string | null
           full_name?: string | null
           id?: string
           skill?: string | null
@@ -49,6 +53,8 @@ export type Database = {
           cnic_number?: string | null
           comment?: string | null
           created_at?: string
+          education?: string | null
+          experience?: string | null
           full_name?: string | null
           id?: string
           skill?: string | null
