@@ -109,6 +109,7 @@ export type Database = {
           created_at: string
           id: string
           is_read: boolean
+          request_id: string | null
           title: string
           type: string
           user_id: string
@@ -118,6 +119,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_read?: boolean
+          request_id?: string | null
           title: string
           type?: string
           user_id: string
@@ -127,11 +129,20 @@ export type Database = {
           created_at?: string
           id?: string
           is_read?: boolean
+          request_id?: string | null
           title?: string
           type?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "notifications_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "certificate_requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
