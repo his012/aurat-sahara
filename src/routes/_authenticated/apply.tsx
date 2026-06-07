@@ -78,16 +78,36 @@ function Apply() {
     },
   });
 
-  const handleFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
-    if (files.length === 0) return;
-    setPendingUploads((prev) => [...prev, ...files]);
-    setPreviews((prev) => [...prev, ...files.map((f) => URL.createObjectURL(f))]);
     if (fileRef.current) fileRef.current.value = "";
+    if (files.length === 0) return;
+    if (!userId) {
+      toast.error("Please sign in again.");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      for (const f of files) {
+        const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}-${f.name}`;
+        const { error } = await supabase.storage
+          .from("portfolio-images")
+          .upload(path, f);
+        if (error) {
+          toast.error("Could not upload an image. Please try again.");
+          continue;
+        }
+        setUploadedImageUrls((prev) => [...prev, path]);
+        setPreviews((prev) => [...prev, URL.createObjectURL(f)]);
+      }
+    } finally {
+      setUploading(false);
+    }
   };
 
   const removeUpload = (idx: number) => {
-    setPendingUploads((prev) => prev.filter((_, i) => i !== idx));
+    setUploadedImageUrls((prev) => prev.filter((_, i) => i !== idx));
     setPreviews((prev) => prev.filter((_, i) => i !== idx));
   };
 
