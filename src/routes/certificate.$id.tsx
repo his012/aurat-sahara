@@ -78,30 +78,30 @@ function CertificatePage() {
             >
               Aurat Sahara
             </h1>
-            <p className="mt-2 text-sm uppercase tracking-[0.25em]" style={{ color: "#A3206A" }}>
-              Certificate of Skill Verification
+            <p className="mt-2 text-sm uppercase tracking-[0.25em]" style={{ color: "#A3206A", ...fontStyle }}>
+              {tr.certSubtitle}
             </p>
 
             <div className="mx-auto my-8 h-px w-24" style={{ backgroundColor: "#D4A0B8" }} />
 
-            <p className="mx-auto max-w-md text-lg leading-relaxed" style={{ color: "#5B4750" }}>
-              This certifies that{" "}
+            <p className="mx-auto max-w-md text-lg leading-relaxed" style={{ color: "#5B4750", ...fontStyle }}>
+              {tr.certBodyPrefix}{" "}
               <span className="font-semibold" style={{ color: "#8B2252" }}>
                 {cert.full_name || "—"}
               </span>{" "}
-              has demonstrated verified proficiency in{" "}
+              {tr.certBodyMiddle}{" "}
               <span className="font-semibold" style={{ color: "#8B2252" }}>
                 {cert.skill || "—"}
               </span>
               .
             </p>
 
-            <p className="mt-8 text-sm" style={{ color: "#7A6470" }}>
-              Issued on {formatDate(cert.issue_date)}
+            <p className="mt-8 text-sm" style={{ color: "#7A6470", ...fontStyle }}>
+              {tr.issuedOn} {formatDate(cert.issue_date)}
             </p>
 
             <div className="mt-10 text-xs" style={{ color: "#9A7E8C" }}>
-              <p>Verify this certificate at:</p>
+              <p style={fontStyle}>{tr.verifyAt}</p>
               <a
                 href={verifyUrl}
                 className="break-all underline"
@@ -118,9 +118,9 @@ function CertificatePage() {
           <button
             onClick={() => window.print()}
             className="rounded-full px-8 py-3 font-semibold text-white transition-colors hover:opacity-90"
-            style={{ backgroundColor: "#C2587A" }}
+            style={{ backgroundColor: "#C2587A", ...fontStyle }}
           >
-            Download Certificate
+            {tr.downloadCertificate}
           </button>
         </div>
       </div>
