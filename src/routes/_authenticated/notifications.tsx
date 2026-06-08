@@ -38,6 +38,11 @@ function formatDate(iso: string) {
 function Notifications() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const lang = useMemo(getLang, []);
+  const tr = t(lang);
+  const rtl = isRtl(lang);
+  const fontStyle = rtl ? { fontFamily: "var(--font-urdu)" } : undefined;
+
 
   const { data, isLoading } = useQuery({
     queryKey: ["notifications", "list"],
