@@ -115,24 +115,24 @@ function Home() {
       <Dialog open={lockOpen} onOpenChange={setLockOpen}>
         <DialogContent className="max-w-xs">
           <DialogHeader>
-            <DialogTitle style={{ color: "#8B2252" }}>Admin Access</DialogTitle>
-            <DialogDescription>Enter the password to continue.</DialogDescription>
+            <DialogTitle style={{ color: "#8B2252", ...fontStyle }}>{tr.adminAccess}</DialogTitle>
+            <DialogDescription style={fontStyle}>{tr.adminEnterPassword}</DialogDescription>
           </DialogHeader>
           <Input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleUnlock()}
-            placeholder="Password"
+            placeholder={tr.password}
             style={{ minHeight: "48px", borderColor: "#D4A0B8", borderRadius: "12px" }}
             autoFocus
           />
           <button
             onClick={handleUnlock}
             className="mt-2 w-full rounded-full px-6 py-3 font-semibold text-white transition-colors hover:opacity-90"
-            style={{ backgroundColor: "#C2587A" }}
+            style={{ backgroundColor: "#C2587A", ...fontStyle }}
           >
-            Unlock
+            {tr.unlock}
           </button>
         </DialogContent>
       </Dialog>
