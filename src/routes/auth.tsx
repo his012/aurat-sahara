@@ -87,8 +87,11 @@ function AuthPage() {
     toast.success(tr.resetLinkSent);
   };
 
+  const fontStyle = rtl ? { fontFamily: "var(--font-urdu)" } : undefined;
+
   return (
     <div
+      dir={rtl ? "rtl" : "ltr"}
       className="flex min-h-screen flex-col items-center justify-center px-6 py-12"
       style={{ backgroundColor: "#FAF5EE" }}
     >
@@ -109,17 +112,18 @@ function AuthPage() {
           className="mb-6 grid grid-cols-2 gap-1 rounded-xl p-1"
           style={{ backgroundColor: "#F4E8DF" }}
         >
-          {(["signup", "signin"] as const).map((t) => (
+          {(["signup", "signin"] as const).map((tabKey) => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
+              key={tabKey}
+              onClick={() => setTab(tabKey)}
               className="rounded-lg py-2 text-sm font-medium transition-colors"
               style={{
-                backgroundColor: tab === t ? "#FFFFFF" : "transparent",
-                color: tab === t ? "#8B2252" : "#9A8694",
+                backgroundColor: tab === tabKey ? "#FFFFFF" : "transparent",
+                color: tab === tabKey ? "#8B2252" : "#9A8694",
+                ...fontStyle,
               }}
             >
-              {t === "signup" ? "Sign Up" : "Sign In"}
+              {tabKey === "signup" ? tr.signUp : tr.signIn}
             </button>
           ))}
         </div>
@@ -129,7 +133,7 @@ function AuthPage() {
             <input
               type="email"
               required
-              placeholder="Email"
+              placeholder={tr.email}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full border bg-white px-4 text-base outline-none focus:ring-2"
@@ -138,7 +142,7 @@ function AuthPage() {
             <input
               type="password"
               required
-              placeholder="Password"
+              placeholder={tr.password}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full border bg-white px-4 text-base outline-none focus:ring-2"
@@ -147,20 +151,20 @@ function AuthPage() {
             <input
               type="password"
               required
-              placeholder="Confirm Password"
+              placeholder={tr.confirmPassword}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full border bg-white px-4 text-base outline-none focus:ring-2"
               style={inputStyle}
             />
-            <SubmitButton loading={loading} label="Sign Up" />
+            <SubmitButton loading={loading} label={tr.signUp} fontStyle={fontStyle} pleaseWait={tr.pleaseWait} />
           </form>
         ) : (
           <form onSubmit={handleSignIn} className="flex flex-col gap-4">
             <input
               type="email"
               required
-              placeholder="Email"
+              placeholder={tr.email}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full border bg-white px-4 text-base outline-none focus:ring-2"
@@ -169,7 +173,7 @@ function AuthPage() {
             <input
               type="password"
               required
-              placeholder="Password"
+              placeholder={tr.password}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full border bg-white px-4 text-base outline-none focus:ring-2"
@@ -179,31 +183,41 @@ function AuthPage() {
               type="button"
               onClick={handleForgotPassword}
               className="self-end text-sm font-medium hover:underline"
-              style={{ color: "#A3206A" }}
+              style={{ color: "#A3206A", ...fontStyle }}
             >
-              Forgot Password?
+              {tr.forgotPassword}
             </button>
-            <SubmitButton loading={loading} label="Sign In" />
+            <SubmitButton loading={loading} label={tr.signIn} fontStyle={fontStyle} pleaseWait={tr.pleaseWait} />
           </form>
         )}
       </div>
 
-      <Link to="/" className="mt-6 text-sm" style={{ color: "#9A8694" }}>
-        ← Change language
+      <Link to="/" className="mt-6 text-sm" style={{ color: "#9A8694", ...fontStyle }}>
+        {tr.changeLanguage}
       </Link>
     </div>
   );
 }
 
-function SubmitButton({ loading, label }: { loading: boolean; label: string }) {
+function SubmitButton({
+  loading,
+  label,
+  fontStyle,
+  pleaseWait,
+}: {
+  loading: boolean;
+  label: string;
+  fontStyle?: React.CSSProperties;
+  pleaseWait: string;
+}) {
   return (
     <button
       type="submit"
       disabled={loading}
       className="w-full rounded-full font-semibold text-white shadow-sm transition-transform hover:brightness-105 active:scale-[0.99] disabled:opacity-60"
-      style={{ backgroundColor: "#C2587A", height: "52px" }}
+      style={{ backgroundColor: "#C2587A", height: "52px", ...fontStyle }}
     >
-      {loading ? "Please wait…" : label}
+      {loading ? pleaseWait : label}
     </button>
   );
 }
