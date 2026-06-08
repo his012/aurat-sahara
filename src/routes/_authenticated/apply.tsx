@@ -33,14 +33,12 @@ const GREETING: Record<string, string> = {
   en: "Salam! I am Aurat Sahara AI. What skill would you like a certificate for?",
 };
 
-function getLang(): string {
-  if (typeof window === "undefined") return "en";
-  return localStorage.getItem("selectedLang") || "en";
-}
-
 function Apply() {
   const navigate = useNavigate();
   const lang = useMemo(getLang, []);
+  const tr = t(lang);
+  const rtl = isRtl(lang);
+  const fontStyle = rtl ? { fontFamily: "var(--font-urdu)" } : undefined;
   const callGrok = useServerFn(grokChat);
 
   const [userId, setUserId] = useState<string | null>(null);
