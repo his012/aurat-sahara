@@ -352,11 +352,11 @@ function Apply() {
                 >
                   <Paperclip size={20} />
                   {uploading ? (
-                    <span className="text-xs font-medium">uploading…</span>
+                    <span className="text-xs font-medium" style={fontStyle}>{tr.uploading}</span>
                   ) : (
                     uploadedImageUrls.length > 0 && (
-                      <span className="text-xs font-medium">
-                        📎 {uploadedImageUrls.length} uploaded
+                      <span className="text-xs font-medium" style={fontStyle}>
+                        📎 {uploadedImageUrls.length} {tr.uploadedSuffix}
                       </span>
                     )
                   )}
