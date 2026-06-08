@@ -300,8 +300,8 @@ function Apply() {
               {sending && (
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-8 shrink-0 rounded-full" style={{ backgroundColor: "#C2587A" }} />
-                  <div className="rounded-2xl px-4 py-2 text-sm" style={{ backgroundColor: "#F6E8F0", color: "#9B8794" }}>
-                    typing…
+                  <div className="rounded-2xl px-4 py-2 text-sm" style={{ backgroundColor: "#F6E8F0", color: "#9B8794", ...fontStyle }}>
+                    {tr.typing}
                   </div>
                 </div>
               )}
@@ -310,10 +310,10 @@ function Apply() {
             {submitted && (
               <div
                 className="mx-4 mb-2 flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium"
-                style={{ backgroundColor: "#E5F6EC", color: "#1E7E45" }}
+                style={{ backgroundColor: "#E5F6EC", color: "#1E7E45", ...fontStyle }}
               >
                 <CheckCircle2 size={18} />
-                Aapki application submit ho gayi! Notification mein update milegi.
+                {tr.submittedSuccess}
               </div>
             )}
 
