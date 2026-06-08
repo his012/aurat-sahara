@@ -97,18 +97,17 @@ function Home() {
 
         <div
           className="mt-10 w-full rounded-2xl border bg-white/60 p-6 text-base leading-relaxed"
-          style={{ borderColor: "#F0C9DD", color: "#6B5563" }}
+          style={{ borderColor: "#F0C9DD", color: "#6B5563", ...fontStyle }}
         >
-          AI ke zariye apni skill ka certificate apply karein. Hum aapki application review karenge
-          aur approve ya comment ke saath notification bhej denge.
+          {tr.homeIntro}
         </div>
 
         <button
           onClick={() => navigate({ to: "/apply" })}
           className="mt-10 w-full rounded-full px-8 text-lg font-semibold text-white transition-colors hover:opacity-90"
-          style={{ backgroundColor: "#C2587A", height: "56px" }}
+          style={{ backgroundColor: "#C2587A", height: "56px", ...fontStyle }}
         >
-          Shuru Karein — شروع کریں
+          {tr.startBtn}
         </button>
       </div>
 
