@@ -61,7 +61,7 @@ function Home() {
   };
 
   return (
-    <div className="min-h-screen px-6 py-6" style={{ backgroundColor: "#FAF5EE" }}>
+    <div dir={rtl ? "rtl" : "ltr"} className="min-h-screen px-6 py-6" style={{ backgroundColor: "#FAF5EE" }}>
       {/* Top bar */}
       <div className="flex items-center justify-between">
         <button
