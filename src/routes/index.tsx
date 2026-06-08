@@ -37,11 +37,7 @@ function LanguageSelect() {
   const navigate = useNavigate();
 
   const choose = (value: LangOption["value"]) => {
-    try {
-      localStorage.setItem("selectedLang", value);
-    } catch {
-      /* ignore storage errors */
-    }
+    setLang(value as Lang);
     navigate({ to: "/auth" });
   };
 
