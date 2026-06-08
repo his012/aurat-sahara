@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { grokChat } from "@/lib/chat.functions";
+import { getLang, isRtl, t } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/apply")({
   head: () => ({
