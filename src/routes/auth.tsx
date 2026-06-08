@@ -26,6 +26,9 @@ const inputStyle: React.CSSProperties = {
 
 function AuthPage() {
   const navigate = useNavigate();
+  const lang = useMemo(getLang, []);
+  const tr = t(lang);
+  const rtl = isRtl(lang);
   const [tab, setTab] = useState<"signup" | "signin">("signup");
   const [loading, setLoading] = useState(false);
 
