@@ -82,7 +82,7 @@ function Apply() {
     if (fileRef.current) fileRef.current.value = "";
     if (files.length === 0) return;
     if (!userId) {
-      toast.error("Please sign in again.");
+      toast.error(tr.signInAgain);
       return;
     }
 
@@ -94,7 +94,7 @@ function Apply() {
           .from("portfolio-images")
           .upload(path, f);
         if (error) {
-          toast.error("Could not upload an image. Please try again.");
+          toast.error(tr.uploadFailed);
           continue;
         }
         setUploadedImageUrls((prev) => [...prev, path]);
@@ -114,7 +114,7 @@ function Apply() {
     const SR =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) {
-      toast.error("Voice input is not supported in this browser.");
+      toast.error(tr.voiceUnsupported);
       return;
     }
     const recognition = new SR();
@@ -127,7 +127,7 @@ function Apply() {
       setInput((prev) => (prev ? prev + " " : "") + transcript);
     };
     recognition.onerror = () => {
-      toast.error("Could not capture voice. Please try again.");
+      toast.error(tr.voiceFailed);
       setListening(false);
     };
     recognition.onend = () => setListening(false);
@@ -164,7 +164,7 @@ function Apply() {
     const text = input.trim();
     if (!text && uploadedImageUrls.length === 0) return;
     if (!userId) {
-      toast.error("Please sign in again.");
+      toast.error(tr.signInAgain);
       return;
     }
 
@@ -199,7 +199,7 @@ function Apply() {
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Sorry, something went wrong. Please try again." },
+        { role: "assistant", content: tr.somethingWrong },
       ]);
     } finally {
       setSending(false);
