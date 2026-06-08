@@ -375,9 +375,9 @@ function Apply() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), send())}
                   disabled={submitted}
-                  placeholder={submitted ? "Application submitted" : "Type your message…"}
+                  placeholder={submitted ? tr.applicationSubmitted : tr.typeMessage}
                   className="flex-1 rounded-full border px-4 py-2.5 text-sm outline-none disabled:opacity-50"
-                  style={{ borderColor: "#D4A0B8" }}
+                  style={{ borderColor: "#D4A0B8", ...fontStyle }}
                 />
                 <button
                   onClick={send}
