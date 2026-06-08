@@ -167,9 +167,9 @@ function Notifications() {
                           to="/certificate/$id"
                           params={{ id: certId }}
                           className="mt-3 inline-block rounded-full px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90"
-                          style={{ backgroundColor: "#C2587A" }}
+                          style={{ backgroundColor: "#C2587A", ...fontStyle }}
                         >
-                          View Certificate
+                          {tr.viewCertificate}
                         </Link>
                       )}
                     </div>
