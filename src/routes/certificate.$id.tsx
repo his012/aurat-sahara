@@ -42,7 +42,7 @@ function CertificatePage() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: "#FAF5EE" }}>
-        <p style={{ color: "#8B2252" }}>Loading…</p>
+        <p style={{ color: "#8B2252", ...fontStyle }}>{tr.loading}</p>
       </div>
     );
   }
@@ -50,9 +50,9 @@ function CertificatePage() {
   if (!cert) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6" style={{ backgroundColor: "#FAF5EE" }}>
-        <p className="text-lg" style={{ color: "#8B2252" }}>Certificate not found.</p>
-        <Link to="/home" className="rounded-full px-6 py-2 font-semibold text-white" style={{ backgroundColor: "#C2587A" }}>
-          Back to Home
+        <p className="text-lg" style={{ color: "#8B2252", ...fontStyle }}>{tr.certNotFound}</p>
+        <Link to="/home" className="rounded-full px-6 py-2 font-semibold text-white" style={{ backgroundColor: "#C2587A", ...fontStyle }}>
+          {tr.backToHome}
         </Link>
       </div>
     );
