@@ -207,14 +207,14 @@ function Apply() {
   };
 
   return (
-    <div className="min-h-screen px-4 py-6 md:px-8" style={{ backgroundColor: "#FAF5EE" }}>
+    <div dir={rtl ? "rtl" : "ltr"} className="min-h-screen px-4 py-6 md:px-8" style={{ backgroundColor: "#FAF5EE" }}>
       <div className="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row">
-        {/* Left: Meri Applications */}
+        {/* Left: My Applications */}
         <aside className="w-full md:w-[30%]">
           <div className="rounded-2xl border bg-white/70 p-4" style={{ borderColor: "#F0C9DD" }}>
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-lg font-bold" style={{ color: "#8B2252" }}>
-                Meri Applications
+              <h2 className="text-lg font-bold" style={{ color: "#8B2252", ...fontStyle }}>
+                {tr.myApplications}
               </h2>
               <span
                 className="rounded-full px-2.5 py-0.5 text-sm font-semibold text-white"
@@ -225,8 +225,8 @@ function Apply() {
             </div>
             <div className="flex flex-col gap-3">
               {apps.length === 0 && (
-                <p className="text-sm" style={{ color: "#9B8794" }}>
-                  Abhi koi application nahi. Niche chat se shuru karein.
+                <p className="text-sm" style={{ color: "#9B8794", ...fontStyle }}>
+                  {tr.noApplications}
                 </p>
               )}
               {apps.map((a) => (
