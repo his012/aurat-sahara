@@ -56,7 +56,7 @@ function Home() {
       setPassword("");
       navigate({ to: "/admin" });
     } else {
-      toast.error("Ghalat password.");
+      toast.error(tr.wrongPassword);
     }
   };
 
