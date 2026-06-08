@@ -56,7 +56,7 @@ function AuthPage() {
     if (data.session) {
       navigate({ to: "/home" });
     } else {
-      toast.success("Account created! Check your email to confirm your address.");
+      toast.success(tr.accountCreated);
     }
   };
 
