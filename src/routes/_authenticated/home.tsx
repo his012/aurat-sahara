@@ -27,6 +27,10 @@ export const Route = createFileRoute("/_authenticated/home")({
 
 function Home() {
   const navigate = useNavigate();
+  const lang = useMemo(getLang, []);
+  const tr = t(lang);
+  const rtl = isRtl(lang);
+  const fontStyle = rtl ? { fontFamily: "var(--font-urdu)" } : undefined;
   const [lockOpen, setLockOpen] = useState(false);
   const [password, setPassword] = useState("");
 
