@@ -27,6 +27,10 @@ function formatDate(iso: string | null) {
 function CertificatePage() {
   const { id } = Route.useParams();
   const fetchCert = useServerFn(getCertificate);
+  const lang = useMemo(getLang, []);
+  const tr = t(lang);
+  const rtl = isRtl(lang);
+  const fontStyle = rtl ? { fontFamily: "var(--font-urdu)" } : undefined;
 
   const { data: cert, isLoading } = useQuery({
     queryKey: ["certificate", id],
