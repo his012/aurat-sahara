@@ -74,7 +74,7 @@ function AuthPage() {
 
   const handleForgotPassword = async () => {
     if (!email) {
-      toast.error("Enter your email above first.");
+      toast.error(tr.enterEmailFirst);
       return;
     }
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -84,7 +84,7 @@ function AuthPage() {
       toast.error(error.message);
       return;
     }
-    toast.success("Password reset link sent to your email.");
+    toast.success(tr.resetLinkSent);
   };
 
   return (
