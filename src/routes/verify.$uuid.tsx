@@ -19,6 +19,11 @@ export const Route = createFileRoute("/verify/$uuid")({
 function VerifyPage() {
   const { uuid } = Route.useParams();
   const doVerify = useServerFn(verifyCertificate);
+  const lang = useMemo(getLang, []);
+  const tr = t(lang);
+  const rtl = isRtl(lang);
+  const fontStyle = rtl ? { fontFamily: "var(--font-urdu)" } : undefined;
+
 
   const { data, isLoading } = useQuery({
     queryKey: ["verify", uuid],
