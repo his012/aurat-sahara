@@ -1,7 +1,9 @@
+import { useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getCertificate } from "@/lib/certificates.functions";
+import { getLang, isRtl, t } from "@/lib/i18n";
 
 export const Route = createFileRoute("/certificate/$id")({
   head: () => ({
@@ -25,6 +27,10 @@ function formatDate(iso: string | null) {
 function CertificatePage() {
   const { id } = Route.useParams();
   const fetchCert = useServerFn(getCertificate);
+  const lang = useMemo(getLang, []);
+  const tr = t(lang);
+  const rtl = isRtl(lang);
+  const fontStyle = rtl ? { fontFamily: "var(--font-urdu)" } : undefined;
 
   const { data: cert, isLoading } = useQuery({
     queryKey: ["certificate", id],
@@ -36,7 +42,7 @@ function CertificatePage() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: "#FAF5EE" }}>
-        <p style={{ color: "#8B2252" }}>Loading…</p>
+        <p style={{ color: "#8B2252", ...fontStyle }}>{tr.loading}</p>
       </div>
     );
   }
@@ -44,9 +50,9 @@ function CertificatePage() {
   if (!cert) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6" style={{ backgroundColor: "#FAF5EE" }}>
-        <p className="text-lg" style={{ color: "#8B2252" }}>Certificate not found.</p>
-        <Link to="/home" className="rounded-full px-6 py-2 font-semibold text-white" style={{ backgroundColor: "#C2587A" }}>
-          Back to Home
+        <p className="text-lg" style={{ color: "#8B2252", ...fontStyle }}>{tr.certNotFound}</p>
+        <Link to="/home" className="rounded-full px-6 py-2 font-semibold text-white" style={{ backgroundColor: "#C2587A", ...fontStyle }}>
+          {tr.backToHome}
         </Link>
       </div>
     );
@@ -72,30 +78,30 @@ function CertificatePage() {
             >
               Aurat Sahara
             </h1>
-            <p className="mt-2 text-sm uppercase tracking-[0.25em]" style={{ color: "#A3206A" }}>
-              Certificate of Skill Verification
+            <p className="mt-2 text-sm uppercase tracking-[0.25em]" style={{ color: "#A3206A", ...fontStyle }}>
+              {tr.certSubtitle}
             </p>
 
             <div className="mx-auto my-8 h-px w-24" style={{ backgroundColor: "#D4A0B8" }} />
 
-            <p className="mx-auto max-w-md text-lg leading-relaxed" style={{ color: "#5B4750" }}>
-              This certifies that{" "}
+            <p className="mx-auto max-w-md text-lg leading-relaxed" style={{ color: "#5B4750", ...fontStyle }}>
+              {tr.certBodyPrefix}{" "}
               <span className="font-semibold" style={{ color: "#8B2252" }}>
                 {cert.full_name || "—"}
               </span>{" "}
-              has demonstrated verified proficiency in{" "}
+              {tr.certBodyMiddle}{" "}
               <span className="font-semibold" style={{ color: "#8B2252" }}>
                 {cert.skill || "—"}
               </span>
               .
             </p>
 
-            <p className="mt-8 text-sm" style={{ color: "#7A6470" }}>
-              Issued on {formatDate(cert.issue_date)}
+            <p className="mt-8 text-sm" style={{ color: "#7A6470", ...fontStyle }}>
+              {tr.issuedOn} {formatDate(cert.issue_date)}
             </p>
 
             <div className="mt-10 text-xs" style={{ color: "#9A7E8C" }}>
-              <p>Verify this certificate at:</p>
+              <p style={fontStyle}>{tr.verifyAt}</p>
               <a
                 href={verifyUrl}
                 className="break-all underline"
@@ -112,9 +118,9 @@ function CertificatePage() {
           <button
             onClick={() => window.print()}
             className="rounded-full px-8 py-3 font-semibold text-white transition-colors hover:opacity-90"
-            style={{ backgroundColor: "#C2587A" }}
+            style={{ backgroundColor: "#C2587A", ...fontStyle }}
           >
-            Download Certificate
+            {tr.downloadCertificate}
           </button>
         </div>
       </div>

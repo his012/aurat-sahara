@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
+import { getLang, isRtl, t } from "@/lib/i18n";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -25,6 +26,9 @@ const inputStyle: React.CSSProperties = {
 
 function AuthPage() {
   const navigate = useNavigate();
+  const lang = useMemo(getLang, []);
+  const tr = t(lang);
+  const rtl = isRtl(lang);
   const [tab, setTab] = useState<"signup" | "signin">("signup");
   const [loading, setLoading] = useState(false);
 
@@ -35,7 +39,7 @@ function AuthPage() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match.");
+      toast.error(tr.passwordsNoMatch);
       return;
     }
     setLoading(true);
@@ -52,7 +56,7 @@ function AuthPage() {
     if (data.session) {
       navigate({ to: "/home" });
     } else {
-      toast.success("Account created! Check your email to confirm your address.");
+      toast.success(tr.accountCreated);
     }
   };
 
@@ -70,7 +74,7 @@ function AuthPage() {
 
   const handleForgotPassword = async () => {
     if (!email) {
-      toast.error("Enter your email above first.");
+      toast.error(tr.enterEmailFirst);
       return;
     }
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -80,11 +84,14 @@ function AuthPage() {
       toast.error(error.message);
       return;
     }
-    toast.success("Password reset link sent to your email.");
+    toast.success(tr.resetLinkSent);
   };
+
+  const fontStyle = rtl ? { fontFamily: "var(--font-urdu)" } : undefined;
 
   return (
     <div
+      dir={rtl ? "rtl" : "ltr"}
       className="flex min-h-screen flex-col items-center justify-center px-6 py-12"
       style={{ backgroundColor: "#FAF5EE" }}
     >
@@ -105,17 +112,18 @@ function AuthPage() {
           className="mb-6 grid grid-cols-2 gap-1 rounded-xl p-1"
           style={{ backgroundColor: "#F4E8DF" }}
         >
-          {(["signup", "signin"] as const).map((t) => (
+          {(["signup", "signin"] as const).map((tabKey) => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
+              key={tabKey}
+              onClick={() => setTab(tabKey)}
               className="rounded-lg py-2 text-sm font-medium transition-colors"
               style={{
-                backgroundColor: tab === t ? "#FFFFFF" : "transparent",
-                color: tab === t ? "#8B2252" : "#9A8694",
+                backgroundColor: tab === tabKey ? "#FFFFFF" : "transparent",
+                color: tab === tabKey ? "#8B2252" : "#9A8694",
+                ...fontStyle,
               }}
             >
-              {t === "signup" ? "Sign Up" : "Sign In"}
+              {tabKey === "signup" ? tr.signUp : tr.signIn}
             </button>
           ))}
         </div>
@@ -125,7 +133,7 @@ function AuthPage() {
             <input
               type="email"
               required
-              placeholder="Email"
+              placeholder={tr.email}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full border bg-white px-4 text-base outline-none focus:ring-2"
@@ -134,7 +142,7 @@ function AuthPage() {
             <input
               type="password"
               required
-              placeholder="Password"
+              placeholder={tr.password}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full border bg-white px-4 text-base outline-none focus:ring-2"
@@ -143,20 +151,20 @@ function AuthPage() {
             <input
               type="password"
               required
-              placeholder="Confirm Password"
+              placeholder={tr.confirmPassword}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full border bg-white px-4 text-base outline-none focus:ring-2"
               style={inputStyle}
             />
-            <SubmitButton loading={loading} label="Sign Up" />
+            <SubmitButton loading={loading} label={tr.signUp} fontStyle={fontStyle} pleaseWait={tr.pleaseWait} />
           </form>
         ) : (
           <form onSubmit={handleSignIn} className="flex flex-col gap-4">
             <input
               type="email"
               required
-              placeholder="Email"
+              placeholder={tr.email}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full border bg-white px-4 text-base outline-none focus:ring-2"
@@ -165,7 +173,7 @@ function AuthPage() {
             <input
               type="password"
               required
-              placeholder="Password"
+              placeholder={tr.password}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full border bg-white px-4 text-base outline-none focus:ring-2"
@@ -175,31 +183,41 @@ function AuthPage() {
               type="button"
               onClick={handleForgotPassword}
               className="self-end text-sm font-medium hover:underline"
-              style={{ color: "#A3206A" }}
+              style={{ color: "#A3206A", ...fontStyle }}
             >
-              Forgot Password?
+              {tr.forgotPassword}
             </button>
-            <SubmitButton loading={loading} label="Sign In" />
+            <SubmitButton loading={loading} label={tr.signIn} fontStyle={fontStyle} pleaseWait={tr.pleaseWait} />
           </form>
         )}
       </div>
 
-      <Link to="/" className="mt-6 text-sm" style={{ color: "#9A8694" }}>
-        ← Change language
+      <Link to="/" className="mt-6 text-sm" style={{ color: "#9A8694", ...fontStyle }}>
+        {tr.changeLanguage}
       </Link>
     </div>
   );
 }
 
-function SubmitButton({ loading, label }: { loading: boolean; label: string }) {
+function SubmitButton({
+  loading,
+  label,
+  fontStyle,
+  pleaseWait,
+}: {
+  loading: boolean;
+  label: string;
+  fontStyle?: React.CSSProperties;
+  pleaseWait: string;
+}) {
   return (
     <button
       type="submit"
       disabled={loading}
       className="w-full rounded-full font-semibold text-white shadow-sm transition-transform hover:brightness-105 active:scale-[0.99] disabled:opacity-60"
-      style={{ backgroundColor: "#C2587A", height: "52px" }}
+      style={{ backgroundColor: "#C2587A", height: "52px", ...fontStyle }}
     >
-      {loading ? "Please wait…" : label}
+      {loading ? pleaseWait : label}
     </button>
   );
 }

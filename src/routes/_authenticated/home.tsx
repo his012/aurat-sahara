@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Bell, Lock } from "lucide-react";
@@ -13,6 +13,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { getLang, isRtl, t } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/home")({
   head: () => ({
@@ -26,6 +27,10 @@ export const Route = createFileRoute("/_authenticated/home")({
 
 function Home() {
   const navigate = useNavigate();
+  const lang = useMemo(getLang, []);
+  const tr = t(lang);
+  const rtl = isRtl(lang);
+  const fontStyle = rtl ? { fontFamily: "var(--font-urdu)" } : undefined;
   const [lockOpen, setLockOpen] = useState(false);
   const [password, setPassword] = useState("");
 
@@ -51,12 +56,12 @@ function Home() {
       setPassword("");
       navigate({ to: "/admin" });
     } else {
-      toast.error("Ghalat password.");
+      toast.error(tr.wrongPassword);
     }
   };
 
   return (
-    <div className="min-h-screen px-6 py-6" style={{ backgroundColor: "#FAF5EE" }}>
+    <div dir={rtl ? "rtl" : "ltr"} className="min-h-screen px-6 py-6" style={{ backgroundColor: "#FAF5EE" }}>
       {/* Top bar */}
       <div className="flex items-center justify-between">
         <button
@@ -92,18 +97,17 @@ function Home() {
 
         <div
           className="mt-10 w-full rounded-2xl border bg-white/60 p-6 text-base leading-relaxed"
-          style={{ borderColor: "#F0C9DD", color: "#6B5563" }}
+          style={{ borderColor: "#F0C9DD", color: "#6B5563", ...fontStyle }}
         >
-          AI ke zariye apni skill ka certificate apply karein. Hum aapki application review karenge
-          aur approve ya comment ke saath notification bhej denge.
+          {tr.homeIntro}
         </div>
 
         <button
           onClick={() => navigate({ to: "/apply" })}
           className="mt-10 w-full rounded-full px-8 text-lg font-semibold text-white transition-colors hover:opacity-90"
-          style={{ backgroundColor: "#C2587A", height: "56px" }}
+          style={{ backgroundColor: "#C2587A", height: "56px", ...fontStyle }}
         >
-          Shuru Karein — شروع کریں
+          {tr.startBtn}
         </button>
       </div>
 
@@ -111,24 +115,24 @@ function Home() {
       <Dialog open={lockOpen} onOpenChange={setLockOpen}>
         <DialogContent className="max-w-xs">
           <DialogHeader>
-            <DialogTitle style={{ color: "#8B2252" }}>Admin Access</DialogTitle>
-            <DialogDescription>Enter the password to continue.</DialogDescription>
+            <DialogTitle style={{ color: "#8B2252", ...fontStyle }}>{tr.adminAccess}</DialogTitle>
+            <DialogDescription style={fontStyle}>{tr.adminEnterPassword}</DialogDescription>
           </DialogHeader>
           <Input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleUnlock()}
-            placeholder="Password"
+            placeholder={tr.password}
             style={{ minHeight: "48px", borderColor: "#D4A0B8", borderRadius: "12px" }}
             autoFocus
           />
           <button
             onClick={handleUnlock}
             className="mt-2 w-full rounded-full px-6 py-3 font-semibold text-white transition-colors hover:opacity-90"
-            style={{ backgroundColor: "#C2587A" }}
+            style={{ backgroundColor: "#C2587A", ...fontStyle }}
           >
-            Unlock
+            {tr.unlock}
           </button>
         </DialogContent>
       </Dialog>

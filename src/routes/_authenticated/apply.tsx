@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { grokChat } from "@/lib/chat.functions";
+import { getLang, isRtl, t } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/apply")({
   head: () => ({
@@ -32,14 +33,12 @@ const GREETING: Record<string, string> = {
   en: "Salam! I am Aurat Sahara AI. What skill would you like a certificate for?",
 };
 
-function getLang(): string {
-  if (typeof window === "undefined") return "en";
-  return localStorage.getItem("selectedLang") || "en";
-}
-
 function Apply() {
   const navigate = useNavigate();
   const lang = useMemo(getLang, []);
+  const tr = t(lang);
+  const rtl = isRtl(lang);
+  const fontStyle = rtl ? { fontFamily: "var(--font-urdu)" } : undefined;
   const callGrok = useServerFn(grokChat);
 
   const [userId, setUserId] = useState<string | null>(null);
@@ -83,7 +82,7 @@ function Apply() {
     if (fileRef.current) fileRef.current.value = "";
     if (files.length === 0) return;
     if (!userId) {
-      toast.error("Please sign in again.");
+      toast.error(tr.signInAgain);
       return;
     }
 
@@ -95,7 +94,7 @@ function Apply() {
           .from("portfolio-images")
           .upload(path, f);
         if (error) {
-          toast.error("Could not upload an image. Please try again.");
+          toast.error(tr.uploadFailed);
           continue;
         }
         setUploadedImageUrls((prev) => [...prev, path]);
@@ -115,7 +114,7 @@ function Apply() {
     const SR =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) {
-      toast.error("Voice input is not supported in this browser.");
+      toast.error(tr.voiceUnsupported);
       return;
     }
     const recognition = new SR();
@@ -128,7 +127,7 @@ function Apply() {
       setInput((prev) => (prev ? prev + " " : "") + transcript);
     };
     recognition.onerror = () => {
-      toast.error("Could not capture voice. Please try again.");
+      toast.error(tr.voiceFailed);
       setListening(false);
     };
     recognition.onend = () => setListening(false);
@@ -165,7 +164,7 @@ function Apply() {
     const text = input.trim();
     if (!text && uploadedImageUrls.length === 0) return;
     if (!userId) {
-      toast.error("Please sign in again.");
+      toast.error(tr.signInAgain);
       return;
     }
 
@@ -200,7 +199,7 @@ function Apply() {
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Sorry, something went wrong. Please try again." },
+        { role: "assistant", content: tr.somethingWrong },
       ]);
     } finally {
       setSending(false);
@@ -208,14 +207,14 @@ function Apply() {
   };
 
   return (
-    <div className="min-h-screen px-4 py-6 md:px-8" style={{ backgroundColor: "#FAF5EE" }}>
+    <div dir={rtl ? "rtl" : "ltr"} className="min-h-screen px-4 py-6 md:px-8" style={{ backgroundColor: "#FAF5EE" }}>
       <div className="mx-auto flex max-w-6xl flex-col gap-6 md:flex-row">
-        {/* Left: Meri Applications */}
+        {/* Left: My Applications */}
         <aside className="w-full md:w-[30%]">
           <div className="rounded-2xl border bg-white/70 p-4" style={{ borderColor: "#F0C9DD" }}>
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-lg font-bold" style={{ color: "#8B2252" }}>
-                Meri Applications
+              <h2 className="text-lg font-bold" style={{ color: "#8B2252", ...fontStyle }}>
+                {tr.myApplications}
               </h2>
               <span
                 className="rounded-full px-2.5 py-0.5 text-sm font-semibold text-white"
@@ -226,8 +225,8 @@ function Apply() {
             </div>
             <div className="flex flex-col gap-3">
               {apps.length === 0 && (
-                <p className="text-sm" style={{ color: "#9B8794" }}>
-                  Abhi koi application nahi. Niche chat se shuru karein.
+                <p className="text-sm" style={{ color: "#9B8794", ...fontStyle }}>
+                  {tr.noApplications}
                 </p>
               )}
               {apps.map((a) => (
@@ -301,8 +300,8 @@ function Apply() {
               {sending && (
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-8 shrink-0 rounded-full" style={{ backgroundColor: "#C2587A" }} />
-                  <div className="rounded-2xl px-4 py-2 text-sm" style={{ backgroundColor: "#F6E8F0", color: "#9B8794" }}>
-                    typing…
+                  <div className="rounded-2xl px-4 py-2 text-sm" style={{ backgroundColor: "#F6E8F0", color: "#9B8794", ...fontStyle }}>
+                    {tr.typing}
                   </div>
                 </div>
               )}
@@ -311,10 +310,10 @@ function Apply() {
             {submitted && (
               <div
                 className="mx-4 mb-2 flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium"
-                style={{ backgroundColor: "#E5F6EC", color: "#1E7E45" }}
+                style={{ backgroundColor: "#E5F6EC", color: "#1E7E45", ...fontStyle }}
               >
                 <CheckCircle2 size={18} />
-                Aapki application submit ho gayi! Notification mein update milegi.
+                {tr.submittedSuccess}
               </div>
             )}
 
@@ -353,11 +352,11 @@ function Apply() {
                 >
                   <Paperclip size={20} />
                   {uploading ? (
-                    <span className="text-xs font-medium">uploading…</span>
+                    <span className="text-xs font-medium" style={fontStyle}>{tr.uploading}</span>
                   ) : (
                     uploadedImageUrls.length > 0 && (
-                      <span className="text-xs font-medium">
-                        📎 {uploadedImageUrls.length} uploaded
+                      <span className="text-xs font-medium" style={fontStyle}>
+                        📎 {uploadedImageUrls.length} {tr.uploadedSuffix}
                       </span>
                     )
                   )}
@@ -376,9 +375,9 @@ function Apply() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), send())}
                   disabled={submitted}
-                  placeholder={submitted ? "Application submitted" : "Type your message…"}
+                  placeholder={submitted ? tr.applicationSubmitted : tr.typeMessage}
                   className="flex-1 rounded-full border px-4 py-2.5 text-sm outline-none disabled:opacity-50"
-                  style={{ borderColor: "#D4A0B8" }}
+                  style={{ borderColor: "#D4A0B8", ...fontStyle }}
                 />
                 <button
                   onClick={send}
@@ -396,9 +395,9 @@ function Apply() {
           <button
             onClick={() => navigate({ to: "/home" })}
             className="mt-4 self-start text-sm font-medium"
-            style={{ color: "#8B2252" }}
+            style={{ color: "#8B2252", ...fontStyle }}
           >
-            ← Back to Home
+            {tr.backToHome}
           </button>
         </main>
       </div>

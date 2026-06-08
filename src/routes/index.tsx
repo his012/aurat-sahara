@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { setLang, type Lang } from "@/lib/i18n";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -36,11 +37,7 @@ function LanguageSelect() {
   const navigate = useNavigate();
 
   const choose = (value: LangOption["value"]) => {
-    try {
-      localStorage.setItem("selectedLang", value);
-    } catch {
-      /* ignore storage errors */
-    }
+    setLang(value as Lang);
     navigate({ to: "/auth" });
   };
 

@@ -1,9 +1,11 @@
+import { useMemo } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, XCircle, Info, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
+import { getLang, isRtl, t } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/notifications")({
   head: () => ({
@@ -36,6 +38,11 @@ function formatDate(iso: string) {
 function Notifications() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const lang = useMemo(getLang, []);
+  const tr = t(lang);
+  const rtl = isRtl(lang);
+  const fontStyle = rtl ? { fontFamily: "var(--font-urdu)" } : undefined;
+
 
   const { data, isLoading } = useQuery({
     queryKey: ["notifications", "list"],
@@ -78,32 +85,32 @@ function Notifications() {
       .eq("user_id", userId)
       .eq("is_read", false);
     if (error) {
-      toast.error("Could not update notifications.");
+      toast.error(tr.notifUpdateFailed);
       return;
     }
     queryClient.invalidateQueries({ queryKey: ["notifications"] });
-    toast.success("All notifications marked as read.");
+    toast.success(tr.allMarkedRead);
   };
 
   return (
-    <div className="min-h-screen px-4 py-6" style={{ backgroundColor: "#FAF5EE" }}>
+    <div dir={rtl ? "rtl" : "ltr"} className="min-h-screen px-4 py-6" style={{ backgroundColor: "#FAF5EE" }}>
       <div className="mx-auto max-w-xl">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <button
             onClick={() => navigate({ to: "/home" })}
             className="flex items-center gap-1 text-sm font-medium"
-            style={{ color: "#8B2252" }}
+            style={{ color: "#8B2252", ...fontStyle }}
           >
-            <ArrowLeft size={16} /> Home
+            <ArrowLeft size={16} /> {tr.home}
           </button>
           {hasUnread && (
             <button
               onClick={markAllRead}
               className="rounded-full px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90"
-              style={{ backgroundColor: "#C2587A" }}
+              style={{ backgroundColor: "#C2587A", ...fontStyle }}
             >
-              Mark all as read
+              {tr.markAllRead}
             </button>
           )}
         </div>
@@ -112,13 +119,13 @@ function Notifications() {
           className="mb-6 text-3xl font-bold"
           style={{ color: "#8B2252", fontFamily: "var(--font-display)" }}
         >
-          Notifications
+          {tr.notifications}
         </h1>
 
         {isLoading ? (
-          <p style={{ color: "#8B2252" }}>Loading…</p>
+          <p style={{ color: "#8B2252", ...fontStyle }}>{tr.loading}</p>
         ) : notifications.length === 0 ? (
-          <p style={{ color: "#7A6470" }}>No notifications yet.</p>
+          <p style={{ color: "#7A6470", ...fontStyle }}>{tr.noNotifications}</p>
         ) : (
           <div className="space-y-3">
             {notifications.map((n) => {
@@ -160,9 +167,9 @@ function Notifications() {
                           to="/certificate/$id"
                           params={{ id: certId }}
                           className="mt-3 inline-block rounded-full px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90"
-                          style={{ backgroundColor: "#C2587A" }}
+                          style={{ backgroundColor: "#C2587A", ...fontStyle }}
                         >
-                          View Certificate
+                          {tr.viewCertificate}
                         </Link>
                       )}
                     </div>
