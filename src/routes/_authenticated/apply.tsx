@@ -395,9 +395,9 @@ function Apply() {
           <button
             onClick={() => navigate({ to: "/home" })}
             className="mt-4 self-start text-sm font-medium"
-            style={{ color: "#8B2252" }}
+            style={{ color: "#8B2252", ...fontStyle }}
           >
-            ← Back to Home
+            {tr.backToHome}
           </button>
         </main>
       </div>
