@@ -8,6 +8,8 @@ export type AdminRequest = {
   age: number | null;
   city: string | null;
   cnic_number: string | null;
+  education: string | null;
+  experience: string | null;
   status: "pending" | "approved" | "declined";
   work_proof_urls: string[];
   thumb_urls: string[];
