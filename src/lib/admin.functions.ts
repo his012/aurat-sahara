@@ -33,7 +33,7 @@ export const getAllRequests = createServerFn({ method: "GET" }).handler(
       const thumbs: string[] = [];
       for (const path of row.work_proof_urls ?? []) {
         const { data: signed } = await supabaseAdmin.storage
-          .from("work-proofs")
+          .from("portfolio-images")
           .createSignedUrl(path, 60 * 60);
         if (signed?.signedUrl) thumbs.push(signed.signedUrl);
       }
