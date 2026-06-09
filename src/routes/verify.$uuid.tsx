@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { verifyCertificate } from "@/lib/certificates.functions";
 import { getLang, isRtl, t } from "@/lib/i18n";
+import mark from "@/assets/mark.png";
 
 export const Route = createFileRoute("/verify/$uuid")({
   head: () => ({
