@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getCertificate } from "@/lib/certificates.functions";
 import { getLang, isRtl, t } from "@/lib/i18n";
+import emblem from "@/assets/emblem.png";
+import mark from "@/assets/mark.png";
 
 export const Route = createFileRoute("/certificate/$id")({
   head: () => ({
