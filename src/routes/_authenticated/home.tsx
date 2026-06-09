@@ -97,7 +97,7 @@ function Home() {
       {/* Center content */}
       <div className="relative mx-auto flex max-w-md flex-col items-center pt-10 text-center">
         <img
-          src={emblem}
+          src={mark}
           alt="Aurat Sahara emblem"
           width={1024}
           height={1024}
