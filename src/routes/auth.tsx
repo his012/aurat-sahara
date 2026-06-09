@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { getLang, isRtl, t } from "@/lib/i18n";
+import mark from "@/assets/mark.png";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -20,8 +21,8 @@ export const Route = createFileRoute("/auth")({
 
 const inputStyle: React.CSSProperties = {
   minHeight: "52px",
-  borderColor: "#D4A0B8",
-  borderRadius: "12px",
+  borderColor: "#E0BFD0",
+  borderRadius: "14px",
 };
 
 function AuthPage() {
@@ -92,34 +93,43 @@ function AuthPage() {
   return (
     <div
       dir={rtl ? "rtl" : "ltr"}
-      className="flex min-h-screen flex-col items-center justify-center px-6 py-12"
-      style={{ backgroundColor: "#FAF5EE" }}
+      className="aurat-page relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-12"
     >
       <Toaster />
-      <h1
-        className="mb-8 text-center text-3xl font-bold"
-        style={{ color: "#8B2252", fontFamily: "var(--font-display)" }}
-      >
-        Aurat Sahara
-      </h1>
+      <div className="pointer-events-none absolute -right-24 top-0 h-72 w-72 rounded-full bg-[#e08ca8]/20 blur-3xl" />
+      <div className="pointer-events-none absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-[#c9a84c]/12 blur-3xl" />
 
-      <div
-        className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-sm"
-        style={{ border: "1px solid #EADFD3" }}
-      >
+      <div className="relative mb-6 flex flex-col items-center text-center">
+        <img
+          src={mark}
+          alt="Aurat Sahara"
+          width={1024}
+          height={1024}
+          className="h-20 w-20 object-contain"
+        />
+        <h1
+          className="aurat-display mt-2 text-3xl font-bold"
+          style={{ color: "#8B2252" }}
+        >
+          Aurat Sahara
+        </h1>
+      </div>
+
+      <div className="aurat-card aurat-rise relative w-full max-w-sm rounded-3xl p-6">
         {/* Tabs */}
         <div
-          className="mb-6 grid grid-cols-2 gap-1 rounded-xl p-1"
-          style={{ backgroundColor: "#F4E8DF" }}
+          className="mb-6 grid grid-cols-2 gap-1 rounded-2xl p-1"
+          style={{ backgroundColor: "#F4E3EC" }}
         >
           {(["signup", "signin"] as const).map((tabKey) => (
             <button
               key={tabKey}
               onClick={() => setTab(tabKey)}
-              className="rounded-lg py-2 text-sm font-medium transition-colors"
+              className="rounded-xl py-2.5 text-sm font-semibold transition-all"
               style={{
                 backgroundColor: tab === tabKey ? "#FFFFFF" : "transparent",
-                color: tab === tabKey ? "#8B2252" : "#9A8694",
+                color: tab === tabKey ? "#8B2252" : "#A88E9B",
+                boxShadow: tab === tabKey ? "0 6px 16px -10px rgba(139,34,82,0.5)" : "none",
                 ...fontStyle,
               }}
             >
@@ -136,7 +146,7 @@ function AuthPage() {
               placeholder={tr.email}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border bg-white px-4 text-base outline-none focus:ring-2"
+              className="w-full border bg-white/80 px-4 text-base outline-none transition focus:border-[#C2587A] focus:ring-2 focus:ring-[#C2587A]/20"
               style={inputStyle}
             />
             <input
@@ -145,7 +155,7 @@ function AuthPage() {
               placeholder={tr.password}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border bg-white px-4 text-base outline-none focus:ring-2"
+              className="w-full border bg-white/80 px-4 text-base outline-none transition focus:border-[#C2587A] focus:ring-2 focus:ring-[#C2587A]/20"
               style={inputStyle}
             />
             <input
@@ -154,7 +164,7 @@ function AuthPage() {
               placeholder={tr.confirmPassword}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full border bg-white px-4 text-base outline-none focus:ring-2"
+              className="w-full border bg-white/80 px-4 text-base outline-none transition focus:border-[#C2587A] focus:ring-2 focus:ring-[#C2587A]/20"
               style={inputStyle}
             />
             <SubmitButton loading={loading} label={tr.signUp} fontStyle={fontStyle} pleaseWait={tr.pleaseWait} />
@@ -167,7 +177,7 @@ function AuthPage() {
               placeholder={tr.email}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border bg-white px-4 text-base outline-none focus:ring-2"
+              className="w-full border bg-white/80 px-4 text-base outline-none transition focus:border-[#C2587A] focus:ring-2 focus:ring-[#C2587A]/20"
               style={inputStyle}
             />
             <input
@@ -176,7 +186,7 @@ function AuthPage() {
               placeholder={tr.password}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border bg-white px-4 text-base outline-none focus:ring-2"
+              className="w-full border bg-white/80 px-4 text-base outline-none transition focus:border-[#C2587A] focus:ring-2 focus:ring-[#C2587A]/20"
               style={inputStyle}
             />
             <button
@@ -192,7 +202,7 @@ function AuthPage() {
         )}
       </div>
 
-      <Link to="/" className="mt-6 text-sm" style={{ color: "#9A8694", ...fontStyle }}>
+      <Link to="/" className="relative mt-6 text-sm hover:underline" style={{ color: "#9A8694", ...fontStyle }}>
         {tr.changeLanguage}
       </Link>
     </div>
@@ -214,8 +224,8 @@ function SubmitButton({
     <button
       type="submit"
       disabled={loading}
-      className="w-full rounded-full font-semibold text-white shadow-sm transition-transform hover:brightness-105 active:scale-[0.99] disabled:opacity-60"
-      style={{ backgroundColor: "#C2587A", height: "52px", ...fontStyle }}
+      className="aurat-btn mt-1 w-full rounded-full font-semibold"
+      style={{ height: "52px", ...fontStyle }}
     >
       {loading ? pleaseWait : label}
     </button>
