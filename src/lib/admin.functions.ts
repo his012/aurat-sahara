@@ -8,6 +8,8 @@ export type AdminRequest = {
   age: number | null;
   city: string | null;
   cnic_number: string | null;
+  education: string | null;
+  experience: string | null;
   status: "pending" | "approved" | "declined";
   work_proof_urls: string[];
   thumb_urls: string[];
@@ -31,7 +33,7 @@ export const getAllRequests = createServerFn({ method: "GET" }).handler(
       const thumbs: string[] = [];
       for (const path of row.work_proof_urls ?? []) {
         const { data: signed } = await supabaseAdmin.storage
-          .from("work-proofs")
+          .from("portfolio-images")
           .createSignedUrl(path, 60 * 60);
         if (signed?.signedUrl) thumbs.push(signed.signedUrl);
       }
