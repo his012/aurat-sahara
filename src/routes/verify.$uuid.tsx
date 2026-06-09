@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { verifyCertificate } from "@/lib/certificates.functions";
 import { getLang, isRtl, t } from "@/lib/i18n";
+import mark from "@/assets/mark.png";
 
 export const Route = createFileRoute("/verify/$uuid")({
   head: () => ({
@@ -33,16 +34,19 @@ function VerifyPage() {
   return (
     <div
       dir={rtl ? "rtl" : "ltr"}
-      className="flex min-h-screen items-center justify-center px-6"
-      style={{ backgroundColor: "#FAF5EE" }}
+      className="aurat-page flex min-h-screen items-center justify-center px-6"
     >
       <div className="w-full max-w-md">
-        <h1
-          className="mb-8 text-center text-4xl font-bold"
-          style={{ color: "#8B2252", fontFamily: "var(--font-display)" }}
-        >
-          Aurat Sahara
-        </h1>
+        <div className="mb-8 flex flex-col items-center text-center">
+          <img src={mark} alt="Aurat Sahara" width={1024} height={1024} className="h-16 w-16 object-contain" />
+          <h1
+            className="aurat-display mt-2 text-4xl font-bold"
+            style={{ color: "#8B2252" }}
+          >
+            Aurat Sahara
+          </h1>
+        </div>
+
 
         {isLoading ? (
           <p className="text-center" style={{ color: "#8B2252", ...fontStyle }}>{tr.verifying}</p>

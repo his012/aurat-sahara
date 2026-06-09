@@ -81,7 +81,7 @@ function Admin() {
   };
 
   return (
-    <div className="min-h-screen px-4 py-6 md:px-8" style={{ backgroundColor: "#FAF5EE" }}>
+    <div className="aurat-page min-h-screen px-4 py-6 md:px-8">
       <div className="mx-auto max-w-5xl">
         <div className="mb-4 flex items-center justify-between">
           <h1 className="text-3xl font-bold" style={{ color: "#8B2252", fontFamily: "var(--font-display)" }}>

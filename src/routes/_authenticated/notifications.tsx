@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CheckCircle2, XCircle, Info, ArrowLeft } from "lucide-react";
+import { CheckCircle2, XCircle, Info, ArrowLeft, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
@@ -42,7 +42,6 @@ function Notifications() {
   const tr = t(lang);
   const rtl = isRtl(lang);
   const fontStyle = rtl ? { fontFamily: "var(--font-urdu)" } : undefined;
-
 
   const { data, isLoading } = useQuery({
     queryKey: ["notifications", "list"],
@@ -92,40 +91,46 @@ function Notifications() {
     toast.success(tr.allMarkedRead);
   };
 
+  const accent = (type: string) =>
+    type === "approved" ? "#27AE60" : type === "declined" ? "#E74C3C" : "#A3206A";
+
   return (
-    <div dir={rtl ? "rtl" : "ltr"} className="min-h-screen px-4 py-6" style={{ backgroundColor: "#FAF5EE" }}>
-      <div className="mx-auto max-w-xl">
+    <div dir={rtl ? "rtl" : "ltr"} className="aurat-page relative min-h-screen overflow-hidden px-4 py-6">
+      <div className="pointer-events-none absolute -right-24 -top-10 h-72 w-72 rounded-full bg-[#e08ca8]/15 blur-3xl" />
+
+      <div className="relative mx-auto max-w-xl">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <button
             onClick={() => navigate({ to: "/home" })}
-            className="flex items-center gap-1 text-sm font-medium"
-            style={{ color: "#8B2252", ...fontStyle }}
+            className="flex items-center gap-1.5 rounded-full border bg-white/60 px-3 py-1.5 text-sm font-medium backdrop-blur-sm transition hover:bg-white"
+            style={{ color: "#8B2252", borderColor: "var(--aurat-line)", ...fontStyle }}
           >
-            <ArrowLeft size={16} /> {tr.home}
+            <ArrowLeft size={16} className={rtl ? "rotate-180" : ""} /> {tr.home}
           </button>
           {hasUnread && (
             <button
               onClick={markAllRead}
-              className="rounded-full px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90"
-              style={{ backgroundColor: "#C2587A", ...fontStyle }}
+              className="aurat-btn rounded-full px-4 py-2 text-sm font-semibold"
+              style={fontStyle}
             >
               {tr.markAllRead}
             </button>
           )}
         </div>
 
-        <h1
-          className="mb-6 text-3xl font-bold"
-          style={{ color: "#8B2252", fontFamily: "var(--font-display)" }}
-        >
+        <h1 className="aurat-display mb-1 text-3xl font-bold" style={{ color: "#8B2252" }}>
           {tr.notifications}
         </h1>
+        <div className="mb-6 h-px w-24 aurat-divider" />
 
         {isLoading ? (
           <p style={{ color: "#8B2252", ...fontStyle }}>{tr.loading}</p>
         ) : notifications.length === 0 ? (
-          <p style={{ color: "#7A6470", ...fontStyle }}>{tr.noNotifications}</p>
+          <div className="aurat-card rounded-3xl p-10 text-center">
+            <Info size={28} className="mx-auto mb-3" style={{ color: "var(--aurat-gold)" }} />
+            <p style={{ color: "#7A6470", ...fontStyle }}>{tr.noNotifications}</p>
+          </div>
         ) : (
           <div className="space-y-3">
             {notifications.map((n) => {
@@ -133,13 +138,18 @@ function Notifications() {
               return (
                 <div
                   key={n.id}
-                  className="rounded-xl border p-4"
+                  className="aurat-rise relative overflow-hidden rounded-2xl p-4"
                   style={{
-                    borderColor: "#F0C9DD",
-                    backgroundColor: n.is_read ? "#FFFFFF" : "#FBE9F2",
+                    border: `1px solid ${n.is_read ? "var(--aurat-line)" : "#F2B6D2"}`,
+                    backgroundColor: n.is_read ? "rgba(255,255,255,0.7)" : "#FBE9F2",
+                    backdropFilter: "blur(10px)",
                   }}
                 >
-                  <div className="flex items-start gap-3">
+                  <span
+                    className="absolute inset-y-0 left-0 w-1"
+                    style={{ backgroundColor: accent(n.type) }}
+                  />
+                  <div className="flex items-start gap-3 pl-1">
                     <div className="mt-0.5 shrink-0">
                       {n.type === "approved" ? (
                         <CheckCircle2 size={22} style={{ color: "#27AE60" }} />
@@ -150,7 +160,7 @@ function Notifications() {
                       )}
                     </div>
                     <div className="flex-1">
-                      <p className="font-semibold" style={{ color: "#5B4750" }}>
+                      <p className="font-semibold" style={{ color: "var(--aurat-ink)" }}>
                         {n.title}
                       </p>
                       {n.body && (
@@ -158,7 +168,7 @@ function Notifications() {
                           {n.body}
                         </p>
                       )}
-                      <p className="mt-2 text-xs" style={{ color: "#9A7E8C" }}>
+                      <p className="mt-2 text-xs" style={{ color: "var(--aurat-muted)" }}>
                         {formatDate(n.created_at)}
                       </p>
 
@@ -166,10 +176,11 @@ function Notifications() {
                         <Link
                           to="/certificate/$id"
                           params={{ id: certId }}
-                          className="mt-3 inline-block rounded-full px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90"
-                          style={{ backgroundColor: "#C2587A", ...fontStyle }}
+                          className="aurat-btn mt-3 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold"
+                          style={fontStyle}
                         >
                           {tr.viewCertificate}
+                          <ArrowRight size={15} className={rtl ? "rotate-180" : ""} />
                         </Link>
                       )}
                     </div>
