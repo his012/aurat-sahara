@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { getLang, isRtl, t } from "@/lib/i18n";
-import emblem from "@/assets/emblem.png";
+import mark from "@/assets/mark.png";
 
 export const Route = createFileRoute("/_authenticated/home")({
   head: () => ({
