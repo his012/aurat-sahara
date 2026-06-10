@@ -111,10 +111,20 @@ function CertificatePage() {
                 {tr.certBodyPrefix}{" "}
                 <span className="font-semibold" style={{ color: "#8B2252" }}>
                   {cert.full_name || "—"}
+                  {cert.full_name_ur && (
+                    <span style={{ fontFamily: "var(--font-urdu)" }}>
+                      {" "}({cert.full_name_ur})
+                    </span>
+                  )}
                 </span>{" "}
                 {tr.certBodyMiddle}{" "}
                 <span className="font-semibold" style={{ color: "#8B2252" }}>
                   {cert.skill || "—"}
+                  {cert.skill_ur && (
+                    <span style={{ fontFamily: "var(--font-urdu)" }}>
+                      {" "}({cert.skill_ur})
+                    </span>
+                  )}
                 </span>
                 .
               </p>
