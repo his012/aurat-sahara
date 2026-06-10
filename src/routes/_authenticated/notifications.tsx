@@ -5,7 +5,7 @@ import { CheckCircle2, XCircle, Info, ArrowLeft, ArrowRight } from "lucide-react
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
-import { getLang, isRtl, t } from "@/lib/i18n";
+import { getLang, isRtl, t, notifTitle, notifBody } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/notifications")({
   head: () => ({
@@ -61,17 +61,32 @@ function Notifications() {
         .select("id, request_id")
         .eq("user_id", userId);
 
+      const { data: requests } = await supabase
+        .from("certificate_requests")
+        .select("id, skill, comment")
+        .eq("user_id", userId);
+
       const certByRequest: Record<string, string> = {};
       for (const c of certs ?? []) {
         if (c.request_id) certByRequest[c.request_id] = c.id;
       }
 
-      return { notifications: (notifs ?? []) as Notification[], certByRequest };
+      const reqInfo: Record<string, { skill: string | null; comment: string | null }> = {};
+      for (const r of requests ?? []) {
+        reqInfo[r.id] = { skill: r.skill, comment: r.comment };
+      }
+
+      return {
+        notifications: (notifs ?? []) as Notification[],
+        certByRequest,
+        reqInfo,
+      };
     },
   });
 
   const notifications = data?.notifications ?? [];
   const certByRequest = data?.certByRequest ?? {};
+  const reqInfo = data?.reqInfo ?? {};
   const hasUnread = notifications.some((n) => !n.is_read);
 
   const markAllRead = async () => {
@@ -135,6 +150,12 @@ function Notifications() {
           <div className="space-y-3">
             {notifications.map((n) => {
               const certId = n.request_id ? certByRequest[n.request_id] : undefined;
+              const info = n.request_id ? reqInfo[n.request_id] : undefined;
+              const title = notifTitle(lang, n.type);
+              const body = notifBody(lang, n.type, {
+                skill: info?.skill,
+                reason: info?.comment,
+              });
               return (
                 <div
                   key={n.id}
@@ -160,12 +181,12 @@ function Notifications() {
                       )}
                     </div>
                     <div className="flex-1">
-                      <p className="font-semibold" style={{ color: "var(--aurat-ink)" }}>
-                        {n.title}
+                      <p className="font-semibold" style={{ color: "var(--aurat-ink)", ...fontStyle }}>
+                        {title || n.title}
                       </p>
-                      {n.body && (
-                        <p className="mt-1 text-sm" style={{ color: "#7A6470" }}>
-                          {n.body}
+                      {(body || n.body) && (
+                        <p className="mt-1 text-sm" style={{ color: "#7A6470", ...fontStyle }}>
+                          {body || n.body}
                         </p>
                       )}
                       <p className="mt-2 text-xs" style={{ color: "var(--aurat-muted)" }}>

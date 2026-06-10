@@ -264,4 +264,59 @@ export function t(lang: Lang): Dict {
   return DICTS[lang] ?? en;
 }
 
+// ---- Localized notification text ----
+// Notifications are stored in a fixed language in the database, so we rebuild
+// the title/body on the client in the user's selected language using the
+// notification type plus the related skill / decline reason.
+
+export type NotifType = "approved" | "declined" | "info" | string;
+
+type NotifOpts = { skill?: string | null; reason?: string | null };
+
+export function notifTitle(lang: Lang, type: NotifType): string {
+  const map: Record<Lang, Record<string, string>> = {
+    en: {
+      approved: "Application approved ✓",
+      declined: "Application declined",
+      info: "Application received",
+    },
+    ur: {
+      approved: "درخواست منظور ہو گئی ✓",
+      declined: "درخواست مسترد کر دی گئی",
+      info: "درخواست موصول ہو گئی",
+    },
+    roman: {
+      approved: "Application approve ho gayi ✓",
+      declined: "Application decline ho gayi",
+      info: "Application mosool ho gayi",
+    },
+  };
+  return map[lang]?.[type] ?? map.en[type] ?? "";
+}
+
+export function notifBody(lang: Lang, type: NotifType, opts: NotifOpts = {}): string {
+  const skill = opts.skill?.trim() || "";
+  const reason = opts.reason?.trim() || "";
+  if (type === "approved") {
+    if (lang === "ur")
+      return `مبارک ہو! "${skill}" کے لیے آپ کے سرٹیفکیٹ کی درخواست منظور ہو گئی ہے۔`;
+    if (lang === "roman")
+      return `Mubarak ho! "${skill}" ke liye aapke certificate ki request approve ho gayi hai.`;
+    return `Congratulations! Your certificate request for "${skill}" was approved.`;
+  }
+  if (type === "declined") {
+    if (lang === "ur")
+      return `"${skill}" کے لیے آپ کے سرٹیفکیٹ کی درخواست مسترد کر دی گئی۔${reason ? ` وجہ: ${reason}` : ""}`;
+    if (lang === "roman")
+      return `"${skill}" ke liye aapke certificate ki request decline ho gayi.${reason ? ` Wajah: ${reason}` : ""}`;
+    return `Your certificate request for "${skill}" was declined.${reason ? ` Reason: ${reason}` : ""}`;
+  }
+  // info / received
+  if (lang === "ur")
+    return `"${skill}" کے لیے آپ کے سرٹیفکیٹ کی درخواست زیرِ جائزہ ہے۔`;
+  if (lang === "roman")
+    return `"${skill}" ke liye aapke certificate ki request review mein hai.`;
+  return `Your certificate request for "${skill}" is under review.`;
+}
+
 export type { Dict };

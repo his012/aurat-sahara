@@ -69,10 +69,12 @@ export type Database = {
         Row: {
           created_at: string
           full_name: string | null
+          full_name_ur: string | null
           id: string
           issue_date: string
           request_id: string
           skill: string | null
+          skill_ur: string | null
           updated_at: string
           user_id: string
           uuid_verify: string
@@ -80,10 +82,12 @@ export type Database = {
         Insert: {
           created_at?: string
           full_name?: string | null
+          full_name_ur?: string | null
           id?: string
           issue_date?: string
           request_id: string
           skill?: string | null
+          skill_ur?: string | null
           updated_at?: string
           user_id: string
           uuid_verify?: string
@@ -91,10 +95,12 @@ export type Database = {
         Update: {
           created_at?: string
           full_name?: string | null
+          full_name_ur?: string | null
           id?: string
           issue_date?: string
           request_id?: string
           skill?: string | null
+          skill_ur?: string | null
           updated_at?: string
           user_id?: string
           uuid_verify?: string
