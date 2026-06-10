@@ -5,7 +5,7 @@ import { CheckCircle2, XCircle, Info, ArrowLeft, ArrowRight } from "lucide-react
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
-import { getLang, isRtl, t } from "@/lib/i18n";
+import { getLang, isRtl, t, notifTitle, notifBody } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/notifications")({
   head: () => ({
