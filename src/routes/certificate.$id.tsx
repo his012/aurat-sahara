@@ -151,7 +151,7 @@ function CertificatePage() {
               </div>
 
               <div className="mt-8 text-xs" style={{ color: "#9A7E8C" }}>
-                <p style={fontStyle}>{tr.verifyAt}</p>
+                <p dir={rtl ? "rtl" : "ltr"} style={fontStyle}>{tr.verifyAt}</p>
                 <a
                   href={verifyUrl}
                   className="break-all underline"
