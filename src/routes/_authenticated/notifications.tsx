@@ -61,17 +61,32 @@ function Notifications() {
         .select("id, request_id")
         .eq("user_id", userId);
 
+      const { data: requests } = await supabase
+        .from("certificate_requests")
+        .select("id, skill, comment")
+        .eq("user_id", userId);
+
       const certByRequest: Record<string, string> = {};
       for (const c of certs ?? []) {
         if (c.request_id) certByRequest[c.request_id] = c.id;
       }
 
-      return { notifications: (notifs ?? []) as Notification[], certByRequest };
+      const reqInfo: Record<string, { skill: string | null; comment: string | null }> = {};
+      for (const r of requests ?? []) {
+        reqInfo[r.id] = { skill: r.skill, comment: r.comment };
+      }
+
+      return {
+        notifications: (notifs ?? []) as Notification[],
+        certByRequest,
+        reqInfo,
+      };
     },
   });
 
   const notifications = data?.notifications ?? [];
   const certByRequest = data?.certByRequest ?? {};
+  const reqInfo = data?.reqInfo ?? {};
   const hasUnread = notifications.some((n) => !n.is_read);
 
   const markAllRead = async () => {
