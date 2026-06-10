@@ -107,30 +107,39 @@ function CertificatePage() {
                 <span className="h-px w-16" style={{ backgroundColor: "#C9A84C" }} />
               </div>
 
-              <p className="mx-auto max-w-md text-lg leading-relaxed" style={{ color: "#5B4750", ...fontStyle }}>
+              <p
+                dir={rtl ? "rtl" : "ltr"}
+                className="mx-auto max-w-md text-lg leading-loose"
+                style={{ color: "#5B4750", ...fontStyle }}
+              >
                 {tr.certBodyPrefix}{" "}
-                <span className="font-semibold" style={{ color: "#8B2252" }}>
+                <bdi className="font-semibold" style={{ color: "#8B2252" }}>
                   {cert.full_name || "—"}
                   {cert.full_name_ur && (
-                    <span style={{ fontFamily: "var(--font-urdu)" }}>
+                    <bdi style={{ fontFamily: "var(--font-urdu)" }}>
                       {" "}({cert.full_name_ur})
-                    </span>
+                    </bdi>
                   )}
-                </span>{" "}
+                </bdi>{" "}
                 {tr.certBodyMiddle}{" "}
-                <span className="font-semibold" style={{ color: "#8B2252" }}>
+                <bdi className="font-semibold" style={{ color: "#8B2252" }}>
                   {cert.skill || "—"}
                   {cert.skill_ur && (
-                    <span style={{ fontFamily: "var(--font-urdu)" }}>
+                    <bdi style={{ fontFamily: "var(--font-urdu)" }}>
                       {" "}({cert.skill_ur})
-                    </span>
+                    </bdi>
                   )}
-                </span>
-                .
+                </bdi>
+                {rtl ? "۔" : "."}
               </p>
 
-              <p className="mt-8 text-sm" style={{ color: "#7A6470", ...fontStyle }}>
-                {tr.issuedOn} {formatDate(cert.issue_date)}
+              <p
+                dir={rtl ? "rtl" : "ltr"}
+                className="mt-8 text-sm"
+                style={{ color: "#7A6470", ...fontStyle }}
+              >
+                {tr.issuedOn}{" "}
+                <bdi>{formatDate(cert.issue_date)}</bdi>
               </p>
 
               {/* Seal */}
@@ -142,7 +151,7 @@ function CertificatePage() {
               </div>
 
               <div className="mt-8 text-xs" style={{ color: "#9A7E8C" }}>
-                <p style={fontStyle}>{tr.verifyAt}</p>
+                <p dir={rtl ? "rtl" : "ltr"} style={fontStyle}>{tr.verifyAt}</p>
                 <a
                   href={verifyUrl}
                   className="break-all underline"
