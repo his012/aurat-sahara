@@ -150,6 +150,12 @@ function Notifications() {
           <div className="space-y-3">
             {notifications.map((n) => {
               const certId = n.request_id ? certByRequest[n.request_id] : undefined;
+              const info = n.request_id ? reqInfo[n.request_id] : undefined;
+              const title = notifTitle(lang, n.type);
+              const body = notifBody(lang, n.type, {
+                skill: info?.skill,
+                reason: info?.comment,
+              });
               return (
                 <div
                   key={n.id}
@@ -175,12 +181,12 @@ function Notifications() {
                       )}
                     </div>
                     <div className="flex-1">
-                      <p className="font-semibold" style={{ color: "var(--aurat-ink)" }}>
-                        {n.title}
+                      <p className="font-semibold" style={{ color: "var(--aurat-ink)", ...fontStyle }}>
+                        {title || n.title}
                       </p>
-                      {n.body && (
-                        <p className="mt-1 text-sm" style={{ color: "#7A6470" }}>
-                          {n.body}
+                      {(body || n.body) && (
+                        <p className="mt-1 text-sm" style={{ color: "#7A6470", ...fontStyle }}>
+                          {body || n.body}
                         </p>
                       )}
                       <p className="mt-2 text-xs" style={{ color: "var(--aurat-muted)" }}>
