@@ -145,6 +145,12 @@ function CertificatePage() {
   const rtl = isRtl(lang);
   const fontStyle = rtl ? { fontFamily: "var(--font-urdu)" } : undefined;
 
+  const [rplOpen, setRplOpen] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setRplOpen(true), 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const { data: cert, isLoading } = useQuery({
     queryKey: ["certificate", id],
     queryFn: () => fetchCert({ data: { id } }),
