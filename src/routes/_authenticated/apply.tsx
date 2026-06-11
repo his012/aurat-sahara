@@ -53,6 +53,7 @@ function Apply() {
   const [sending, setSending] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [listening, setListening] = useState(false);
+  const [micAvailable, setMicAvailable] = useState(false);
 
   const fileRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
