@@ -423,15 +423,17 @@ function Apply() {
                       )
                     )}
                   </button>
-                  <button
-                    onClick={startListening}
-                    disabled={submitted}
-                    aria-label="Voice input"
-                    className="rounded-full p-2 hover:bg-[#F6E8F0] disabled:opacity-40"
-                    style={{ color: listening ? "#E74C3C" : "#8B2252" }}
-                  >
-                    <Mic size={20} />
-                  </button>
+                  {micAvailable && (
+                    <button
+                      onClick={startListening}
+                      disabled={submitted}
+                      aria-label="Voice input"
+                      className="rounded-full p-2 hover:bg-[#F6E8F0] disabled:opacity-40"
+                      style={{ color: listening ? "#E74C3C" : "#8B2252" }}
+                    >
+                      <Mic size={20} />
+                    </button>
+                  )}
                   <input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
