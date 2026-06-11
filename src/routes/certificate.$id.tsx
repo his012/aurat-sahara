@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { X } from "lucide-react";
+import { X, ArrowLeft } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getCertificate } from "@/lib/certificates.functions";
@@ -182,8 +182,15 @@ function CertificatePage() {
   return (
     <div className="aurat-page min-h-screen px-4 py-10">
       <div className="mx-auto max-w-2xl">
-        {/* Reopen RPL popup */}
-        <div className="no-print mb-4 flex justify-end">
+        {/* Top bar: back + RPL */}
+        <div className="no-print mb-4 flex items-center justify-between">
+          <Link
+            to="/home"
+            className="flex items-center gap-1.5 rounded-full border bg-white/60 px-3 py-1.5 text-sm font-medium backdrop-blur-sm transition hover:bg-white"
+            style={{ color: "#8B2252", borderColor: "var(--aurat-line)", ...fontStyle }}
+          >
+            <ArrowLeft size={16} className={rtl ? "rotate-180" : ""} /> {tr.home}
+          </Link>
           <button
             onClick={() => setRplOpen(true)}
             className="rounded-full px-4 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
@@ -200,6 +207,15 @@ function CertificatePage() {
           className="cert-print relative mx-auto p-2.5 shadow-[0_30px_70px_-30px_rgba(139,34,82,0.45)]"
           style={{ backgroundColor: "#FAF5EE", border: "3px solid #C9A84C", borderRadius: "8px" }}
         >
+          {/* Exit certificate */}
+          <Link
+            to="/home"
+            aria-label="Exit certificate"
+            className="no-print absolute -right-3 -top-3 z-10 grid h-9 w-9 place-items-center rounded-full text-white shadow-lg transition-opacity hover:opacity-90"
+            style={{ backgroundColor: "#8B2252" }}
+          >
+            <X className="h-5 w-5" />
+          </Link>
           <div
             className="relative overflow-hidden px-8 py-12 text-center"
             style={{ border: "1.5px solid #C2587A", borderRadius: "5px" }}

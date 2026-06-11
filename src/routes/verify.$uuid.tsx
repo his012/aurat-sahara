@@ -1,8 +1,8 @@
 import { useMemo } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, XCircle, ArrowLeft } from "lucide-react";
 import { verifyCertificate } from "@/lib/certificates.functions";
 import { getLang, isRtl, t } from "@/lib/i18n";
 import mark from "@/assets/mark.png";
@@ -37,6 +37,15 @@ function VerifyPage() {
       className="aurat-page flex min-h-screen items-center justify-center px-6"
     >
       <div className="w-full max-w-md">
+        <div className="mb-6 flex justify-start">
+          <Link
+            to="/home"
+            className="flex items-center gap-1.5 rounded-full border bg-white/60 px-3 py-1.5 text-sm font-medium backdrop-blur-sm transition hover:bg-white"
+            style={{ color: "#8B2252", borderColor: "var(--aurat-line)", ...fontStyle }}
+          >
+            <ArrowLeft size={16} className={rtl ? "rotate-180" : ""} /> {tr.home}
+          </Link>
+        </div>
         <div className="mb-8 flex flex-col items-center text-center">
           <img src={mark} alt="Aurat Sahara" width={1024} height={1024} className="h-16 w-16 object-contain" />
           <h1
