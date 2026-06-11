@@ -66,6 +66,14 @@ function Apply() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, sending]);
 
+  useEffect(() => {
+    const supported =
+      typeof window !== "undefined" &&
+      ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) &&
+      !!navigator.mediaDevices?.getUserMedia;
+    setMicAvailable(supported);
+  }, []);
+
   const { data: apps = [], refetch } = useQuery({
     queryKey: ["my-applications", userId],
     enabled: !!userId,
