@@ -182,6 +182,19 @@ function CertificatePage() {
   return (
     <div className="aurat-page min-h-screen px-4 py-10">
       <div className="mx-auto max-w-2xl">
+        {/* Reopen RPL popup */}
+        <div className="no-print mb-4 flex justify-end">
+          <button
+            onClick={() => setRplOpen(true)}
+            className="rounded-full px-4 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            style={{ backgroundColor: "#8B2252", ...fontStyle }}
+          >
+            {RPL_CONTENT[lang].reopen}
+          </button>
+        </div>
+
+        {rplOpen && <RplPopup lang={lang} onClose={() => setRplOpen(false)} />}
+
         {/* Certificate card */}
         <div
           className="cert-print relative mx-auto p-2.5 shadow-[0_30px_70px_-30px_rgba(139,34,82,0.45)]"
