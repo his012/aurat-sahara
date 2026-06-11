@@ -53,6 +53,7 @@ function Apply() {
   const [sending, setSending] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [listening, setListening] = useState(false);
+  const [micAvailable, setMicAvailable] = useState(false);
 
   const fileRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -64,6 +65,14 @@ function Apply() {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, sending]);
+
+  useEffect(() => {
+    const supported =
+      typeof window !== "undefined" &&
+      ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) &&
+      !!navigator.mediaDevices?.getUserMedia;
+    setMicAvailable(supported);
+  }, []);
 
   const { data: apps = [], refetch } = useQuery({
     queryKey: ["my-applications", userId],
@@ -111,15 +120,28 @@ function Apply() {
     setPreviews((prev) => prev.filter((_, i) => i !== idx));
   };
 
-  const startListening = () => {
+  const startListening = async () => {
     const SR =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) {
-      toast.error(tr.voiceUnsupported);
+      setMicAvailable(false);
       return;
     }
+
+    // Request microphone permission first (must stay within the click gesture).
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // We only needed the permission; release the tracks right away.
+      stream.getTracks().forEach((track) => track.stop());
+    } catch {
+      // Permission denied or unavailable: hide the button silently.
+      setMicAvailable(false);
+      setListening(false);
+      return;
+    }
+
     const recognition = new SR();
-    recognition.lang = lang === "ur" ? "ur-PK" : "en-US";
+    recognition.lang = "en-US";
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
     setListening(true);
@@ -127,13 +149,16 @@ function Apply() {
       const transcript = event.results[0][0].transcript;
       setInput((prev) => (prev ? prev + " " : "") + transcript);
     };
-    recognition.onerror = () => {
-      toast.error(tr.voiceFailed);
+    recognition.onerror = (event: any) => {
+      if (event?.error === "not-allowed" || event?.error === "service-not-allowed") {
+        setMicAvailable(false);
+      }
       setListening(false);
     };
     recognition.onend = () => setListening(false);
     recognition.start();
   };
+
 
   const isComplete = (c: any) =>
     !!c &&
@@ -398,15 +423,17 @@ function Apply() {
                       )
                     )}
                   </button>
-                  <button
-                    onClick={startListening}
-                    disabled={submitted}
-                    aria-label="Voice input"
-                    className="rounded-full p-2 hover:bg-[#F6E8F0] disabled:opacity-40"
-                    style={{ color: listening ? "#E74C3C" : "#8B2252" }}
-                  >
-                    <Mic size={20} />
-                  </button>
+                  {micAvailable && (
+                    <button
+                      onClick={startListening}
+                      disabled={submitted}
+                      aria-label="Voice input"
+                      className="rounded-full p-2 hover:bg-[#F6E8F0] disabled:opacity-40"
+                      style={{ color: listening ? "#E74C3C" : "#8B2252" }}
+                    >
+                      <Mic size={20} />
+                    </button>
+                  )}
                   <input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
