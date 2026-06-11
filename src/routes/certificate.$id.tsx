@@ -1,5 +1,6 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getCertificate } from "@/lib/certificates.functions";
@@ -26,6 +27,116 @@ function formatDate(iso: string | null) {
   });
 }
 
+const RPL_LINK = "https://navttc.gov.pk/rpl";
+
+const RPL_CONTENT = {
+  en: {
+    title: "Get Your Official Government Certificate!",
+    intro:
+      "RPL (Recognition of Prior Learning) is a FREE government program by NAVTTC Pakistan. It officially recognizes the skills you already have — even if you learned them at home, from family, or through years of practice — and gives you a nationally recognized certificate that is accepted across Pakistan and even abroad.",
+    stepsTitle: "How to get it:",
+    steps: [
+      "Visit the NAVTTC RPL website",
+      "Find your nearest assessment center",
+      "Submit your documents",
+      "Appear for a simple skills assessment",
+      "Receive your official government verified certificate — completely FREE",
+    ],
+    button: "Visit NAVTTC RPL Website",
+    reopen: "RPL Info",
+  },
+  ur: {
+    title: "سرکاری سرٹیفکیٹ حاصل کریں!",
+    intro:
+      "RPL یعنی Recognition of Prior Learning — پاکستان کا NAVTTC کا مفت سرکاری پروگرام ہے۔ یہ آپ کی اُن مہارتوں کو سرکاری طور پر تسلیم کرتا ہے جو آپ نے گھر میں، خاندان سے، یا برسوں کی محنت سے سیکھی ہیں — اور آپ کو ایک قومی سرٹیفکیٹ دیتا ہے جو پورے پاکستان میں قابلِ قبول ہے۔",
+    stepsTitle: "کیسے حاصل کریں:",
+    steps: [
+      "١. NAVTTC ویب سائٹ پر جائیں",
+      "٢. قریبی مرکز تلاش کریں",
+      "٣. دستاویزات جمع کروائیں",
+      "٤. سادہ مہارت کا جائزہ دیں",
+      "٥. مفت سرکاری سرٹیفکیٹ حاصل کریں",
+    ],
+    button: "NAVTTC ویب سائٹ پر جائیں",
+    reopen: "RPL معلومات",
+  },
+  roman: {
+    title: "Official Government Certificate Hasil Karein!",
+    intro:
+      "RPL yaani Recognition of Prior Learning — Pakistan ka NAVTTC ka bilkul FREE sarkari program hai. Yeh un skills ko officially pehchanta hai jo aap ne ghar mein, family se, ya barson ki mehnat se seekhi hain — aur aapko ek national certificate deta hai jo poore Pakistan mein qabool kiya jata hai.",
+    stepsTitle: "Kaise hasil karein:",
+    steps: [
+      "1. NAVTTC RPL website par jayein",
+      "2. Apna nazdeeqi center dhundein",
+      "3. Documents jama karaein",
+      "4. Simple skills assessment dein",
+      "5. Bilkul FREE official certificate hasil karein",
+    ],
+    button: "NAVTTC RPL Website Kholein",
+    reopen: "RPL Info",
+  },
+} as const;
+
+function RplPopup({ lang, onClose }: { lang: "en" | "ur" | "roman"; onClose: () => void }) {
+  const c = RPL_CONTENT[lang];
+  const rtl = lang === "ur";
+  const fontStyle = rtl ? { fontFamily: "var(--font-urdu)" } : undefined;
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      style={{ backgroundColor: "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)" }}
+      onClick={onClose}
+    >
+      <div
+        dir={rtl ? "rtl" : "ltr"}
+        onClick={(e) => e.stopPropagation()}
+        className="relative max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl sm:p-8"
+        style={{ border: "1px solid rgba(139,34,82,0.15)" }}
+      >
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute end-3 top-3 grid h-9 w-9 place-items-center rounded-full transition-colors hover:bg-[#8B2252]/10"
+          style={{ color: "#8B2252" }}
+        >
+          <X className="h-5 w-5" />
+        </button>
+
+        <h2
+          className="pe-8 text-2xl font-bold leading-snug"
+          style={{ color: "#8B2252", fontFamily: rtl ? "var(--font-urdu)" : "var(--font-display)" }}
+        >
+          {c.title}
+        </h2>
+
+        <p className="mt-4 text-sm leading-loose" style={{ color: "#5B4750", ...fontStyle }}>
+          {c.intro}
+        </p>
+
+        <p className="mt-5 font-semibold" style={{ color: "#8B2252", ...fontStyle }}>
+          {c.stepsTitle}
+        </p>
+        <ul className="mt-2 space-y-2 text-sm leading-relaxed" style={{ color: "#5B4750", ...fontStyle }}>
+          {c.steps.map((s, i) => (
+            <li key={i}>{s}</li>
+          ))}
+        </ul>
+
+        <a
+          href={RPL_LINK}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-6 block w-full rounded-full px-6 py-3 text-center font-semibold text-white transition-opacity hover:opacity-90"
+          style={{ backgroundColor: "#8B2252", ...fontStyle }}
+        >
+          {c.button}
+        </a>
+      </div>
+    </div>
+  );
+}
+
 function CertificatePage() {
   const { id } = Route.useParams();
   const fetchCert = useServerFn(getCertificate);
@@ -33,6 +144,12 @@ function CertificatePage() {
   const tr = t(lang);
   const rtl = isRtl(lang);
   const fontStyle = rtl ? { fontFamily: "var(--font-urdu)" } : undefined;
+
+  const [rplOpen, setRplOpen] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setRplOpen(true), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const { data: cert, isLoading } = useQuery({
     queryKey: ["certificate", id],
@@ -65,6 +182,19 @@ function CertificatePage() {
   return (
     <div className="aurat-page min-h-screen px-4 py-10">
       <div className="mx-auto max-w-2xl">
+        {/* Reopen RPL popup */}
+        <div className="no-print mb-4 flex justify-end">
+          <button
+            onClick={() => setRplOpen(true)}
+            className="rounded-full px-4 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            style={{ backgroundColor: "#8B2252", ...fontStyle }}
+          >
+            {RPL_CONTENT[lang].reopen}
+          </button>
+        </div>
+
+        {rplOpen && <RplPopup lang={lang} onClose={() => setRplOpen(false)} />}
+
         {/* Certificate card */}
         <div
           className="cert-print relative mx-auto p-2.5 shadow-[0_30px_70px_-30px_rgba(139,34,82,0.45)]"
