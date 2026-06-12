@@ -173,10 +173,7 @@
 }
 
 .home-swirl {
-  background:
-    radial-gradient(circle at 18% 30%, var(--home-pink) 0 12%, transparent 36%),
-    radial-gradient(circle at 82% 72%, var(--home-burgundy-soft) 0 10%, transparent 38%),
-    linear-gradient(135deg, var(--home-burgundy), var(--home-burgundy-soft) 48%, var(--home-pink));
+  background: linear-gradient(135deg, var(--home-burgundy), var(--home-burgundy-soft) 48%, var(--home-pink));
   isolation: isolate;
 }
 
@@ -186,8 +183,8 @@
   width: 55rem;
   height: 55rem;
   border-radius: 42% 58% 64% 36% / 48% 34% 66% 52%;
-  filter: blur(38px);
-  opacity: 0.58;
+  filter: blur(72px);
+  opacity: 0.72;
   pointer-events: none;
   will-change: transform;
 }
@@ -197,11 +194,12 @@
   left: -18rem;
   background: conic-gradient(
     from 40deg,
-    transparent,
-    var(--home-pink),
-    transparent 48%,
     var(--home-burgundy-soft),
-    transparent 82%
+    var(--home-pink),
+    var(--home-burgundy) 48%,
+    var(--home-burgundy-soft),
+    var(--home-pink) 82%,
+    var(--home-burgundy-soft)
   );
   animation: home-swirl-clockwise 32s linear infinite;
 }
@@ -212,9 +210,9 @@
   background: conic-gradient(
     from 180deg,
     var(--home-burgundy),
-    transparent 28%,
+    var(--home-burgundy-soft) 28%,
     var(--home-pink),
-    transparent 70%,
+    var(--home-burgundy-soft) 70%,
     var(--home-burgundy)
   );
   animation: home-swirl-counter 38s linear infinite;
