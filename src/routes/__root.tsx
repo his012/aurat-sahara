@@ -4,13 +4,23 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { Bell, Globe, Lock } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { setLang, type Lang } from "@/lib/i18n";
 
 function NotFoundComponent() {
   return (
@@ -125,11 +135,53 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const showHeader = pathname !== "/";
+
+  const changeLanguage = (language: Lang) => {
+    setLang(language);
+    window.location.reload();
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      {showHeader && (
+        <header
+          className="fixed inset-x-0 top-0 z-50 flex h-[50px] items-center justify-between px-4"
+          style={{ backgroundColor: "#4a0e2a" }}
+        >
+          <Button asChild variant="ghost" size="icon" className="text-white hover:bg-white/10 hover:text-white">
+            <Link to="/admin" aria-label="Admin">
+              <Lock size={20} />
+            </Link>
+          </Button>
+
+          <div className="flex items-center gap-1">
+            <Button asChild variant="ghost" size="icon" className="text-white hover:bg-white/10 hover:text-white">
+              <Link to="/notifications" aria-label="Notifications">
+                <Bell size={20} />
+              </Link>
+            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 hover:text-white" aria-label="Change language">
+                  <Globe size={20} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={() => changeLanguage("en")}>English</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => changeLanguage("ur")} dir="rtl">اردو</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => changeLanguage("roman")}>Roman Urdu</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </header>
+      )}
+      <main className={showHeader ? "pt-[50px]" : undefined}>
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+      </main>
     </QueryClientProvider>
   );
 }
