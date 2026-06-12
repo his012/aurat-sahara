@@ -162,6 +162,80 @@
   --aurat-line: rgba(212, 160, 184, 0.38);
   --aurat-grad: linear-gradient(135deg, #a3206a 0%, #c2587a 55%, #e08ca8 100%);
   --aurat-grad-soft: linear-gradient(135deg, #fbeff5 0%, #f7e6ee 100%);
+  --home-cream: oklch(0.985 0.012 75);
+  --home-burgundy: oklch(0.27 0.105 350);
+  --home-burgundy-soft: oklch(0.38 0.13 350);
+  --home-pink: oklch(0.94 0.035 350);
+}
+
+.home-brand-section {
+  background: var(--home-cream);
+}
+
+.home-swirl {
+  background:
+    radial-gradient(circle at 18% 30%, var(--home-pink) 0 12%, transparent 36%),
+    radial-gradient(circle at 82% 72%, var(--home-burgundy-soft) 0 10%, transparent 38%),
+    linear-gradient(135deg, var(--home-burgundy), var(--home-burgundy-soft) 48%, var(--home-pink));
+  isolation: isolate;
+}
+
+.home-swirl-orb {
+  position: absolute;
+  z-index: -1;
+  width: 55rem;
+  height: 55rem;
+  border-radius: 42% 58% 64% 36% / 48% 34% 66% 52%;
+  filter: blur(38px);
+  opacity: 0.58;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.home-swirl-orb-one {
+  top: -28rem;
+  left: -18rem;
+  background: conic-gradient(
+    from 40deg,
+    transparent,
+    var(--home-pink),
+    transparent 48%,
+    var(--home-burgundy-soft),
+    transparent 82%
+  );
+  animation: home-swirl-clockwise 32s linear infinite;
+}
+
+.home-swirl-orb-two {
+  right: -20rem;
+  bottom: -30rem;
+  background: conic-gradient(
+    from 180deg,
+    var(--home-burgundy),
+    transparent 28%,
+    var(--home-pink),
+    transparent 70%,
+    var(--home-burgundy)
+  );
+  animation: home-swirl-counter 38s linear infinite;
+}
+
+@keyframes home-swirl-clockwise {
+  0% { transform: rotate(0deg) translate3d(0, 0, 0) scale(1); }
+  50% { transform: rotate(180deg) translate3d(4rem, 2rem, 0) scale(1.08); }
+  100% { transform: rotate(360deg) translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes home-swirl-counter {
+  0% { transform: rotate(360deg) translate3d(0, 0, 0) scale(1.08); }
+  50% { transform: rotate(180deg) translate3d(-3rem, -2rem, 0) scale(0.95); }
+  100% { transform: rotate(0deg) translate3d(0, 0, 0) scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-swirl-orb {
+    animation: none;
+  }
 }
 
 /* Soft, warm page background with feminine glow accents */
