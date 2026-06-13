@@ -8,7 +8,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode, type FormEvent } from "react";
 import { Bell, Globe, Lock } from "lucide-react";
 
 import appCss from "../styles.css?url";
@@ -20,6 +20,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { setLang, type Lang } from "@/lib/i18n";
 
 function NotFoundComponent() {
@@ -136,11 +144,26 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const showHeader = pathname !== "/";
+  const showHeader = pathname !== "/" && pathname !== "/auth";
+  const router = useRouter();
+
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   const changeLanguage = (language: Lang) => {
     setLang(language);
     window.location.reload();
+  };
+
+  const handlePasswordSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (passwordInput === "123@") {
+      setIsPasswordModalOpen(false);
+      router.navigate({ to: "/admin" });
+    } else {
+      setPasswordError("Wrong password");
+    }
   };
 
   return (
@@ -150,10 +173,8 @@ function RootComponent() {
           className="fixed inset-x-0 top-0 z-50 flex h-[50px] items-center justify-between px-4"
           style={{ backgroundColor: "#4a0e2a" }}
         >
-          <Button asChild variant="ghost" size="icon" className="text-white hover:bg-white/10 hover:text-white">
-            <Link to="/admin" aria-label="Admin">
-              <Lock size={20} />
-            </Link>
+          <Button variant="ghost" size="icon" onClick={() => { setIsPasswordModalOpen(true); setPasswordError(""); setPasswordInput(""); }} className="text-white hover:bg-white/10 hover:text-white" aria-label="Admin">
+            <Lock size={20} />
           </Button>
 
           <div className="flex items-center gap-1">
@@ -182,6 +203,27 @@ function RootComponent() {
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
       </main>
+
+      <Dialog open={isPasswordModalOpen} onOpenChange={setIsPasswordModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Enter Password</DialogTitle>
+            <DialogDescription>Type the admin password to continue.</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handlePasswordSubmit} className="space-y-4">
+            <Input
+              type="password"
+              placeholder="Password"
+              value={passwordInput}
+              onChange={(e) => setPasswordInput(e.target.value)}
+            />
+            {passwordError && <p className="text-sm text-destructive">{passwordError}</p>}
+            <div className="flex justify-end">
+              <Button type="submit">Submit</Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </QueryClientProvider>
   );
 }
