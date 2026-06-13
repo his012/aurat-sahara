@@ -76,7 +76,7 @@ function Home() {
             className="aurat-btn flex w-full items-center justify-center gap-2 rounded-full px-8 text-lg font-semibold"
             style={{ height: "58px", ...fontStyle }}
           >
-            {terms.startBtn ?? (lang === "ur" ? "شروع کریں" : lang === "roman" ? "Shuru Karein" : "Get Started")}
+            {t(lang).startBtn}
             <ArrowRight size={20} className={rtl ? "rotate-180" : ""} />
           </button>
         </div>
