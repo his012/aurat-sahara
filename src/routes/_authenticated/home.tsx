@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { getLang, isRtl } from "@/lib/i18n";
+import { getLang, isRtl, t } from "@/lib/i18n";
 import { getPrivacyTerms } from "@/lib/privacy-terms";
 import { Dialog, DialogPortal, DialogOverlay, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import mark from "@/assets/mark.png";
