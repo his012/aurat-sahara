@@ -172,63 +172,93 @@
 }
 
 .home-swirl {
-  background: linear-gradient(135deg, var(--home-swirl-cream) 0%, var(--home-swirl-pink) 50%, var(--home-swirl-cream) 100%);
+  background: linear-gradient(135deg, #fffaf7 0%, #f5d4e0 50%, #fffaf7 100%);
   isolation: isolate;
 }
 
 .home-swirl-orb {
   position: absolute;
   z-index: -1;
-  width: 60rem;
-  height: 60rem;
   border-radius: 42% 58% 64% 36% / 48% 34% 66% 52%;
-  filter: blur(90px);
-  opacity: 0.45;
+  filter: blur(70px);
+  opacity: 0.7;
   pointer-events: none;
-  will-change: transform;
+  will-change: transform, border-radius;
+  mix-blend-mode: multiply;
 }
 
 .home-swirl-orb-one {
-  top: -30rem;
-  left: -20rem;
-  background: conic-gradient(
-    from 40deg,
-    var(--home-swirl-pink),
-    var(--home-swirl-cream),
-    var(--home-swirl-pink) 50%,
-    var(--home-swirl-cream),
-    var(--home-swirl-pink) 80%,
-    var(--home-swirl-cream)
-  );
-  animation: home-swirl-clockwise 20s linear infinite;
+  width: 44rem;
+  height: 44rem;
+  top: -16rem;
+  left: -14rem;
+  background: radial-gradient(circle at 30% 30%, #4a0e2a, #7b1040 60%, transparent 75%);
+  animation: home-swirl-morph-a 11s ease-in-out infinite;
 }
 
 .home-swirl-orb-two {
-  right: -22rem;
-  bottom: -32rem;
-  background: conic-gradient(
-    from 180deg,
-    var(--home-swirl-cream),
-    var(--home-swirl-pink) 30%,
-    var(--home-swirl-cream),
-    var(--home-swirl-pink) 70%,
-    var(--home-swirl-cream)
-  );
-  animation: home-swirl-counter 26s linear infinite;
+  width: 40rem;
+  height: 40rem;
+  right: -14rem;
+  bottom: -16rem;
+  background: radial-gradient(circle at 60% 40%, #7b1040, #d4587a 60%, transparent 78%);
+  animation: home-swirl-morph-b 9s ease-in-out infinite;
 }
 
-@keyframes home-swirl-clockwise {
-  0% { transform: rotate(0deg) translate3d(0, 0, 0) scale(1); }
-  33% { transform: rotate(120deg) translate3d(3rem, 2rem, 0) scale(1.06); }
-  66% { transform: rotate(240deg) translate3d(-2rem, 3rem, 0) scale(0.98); }
-  100% { transform: rotate(360deg) translate3d(0, 0, 0) scale(1); }
+.home-swirl-orb-three {
+  width: 36rem;
+  height: 36rem;
+  top: -10rem;
+  right: -10rem;
+  background: radial-gradient(circle at 40% 60%, #d4587a, #fffaf7 60%, transparent 80%);
+  animation: home-swirl-morph-c 12s ease-in-out infinite;
+  opacity: 0.55;
 }
 
-@keyframes home-swirl-counter {
-  0% { transform: rotate(360deg) translate3d(0, 0, 0) scale(1.06); }
-  33% { transform: rotate(240deg) translate3d(-3rem, -2rem, 0) scale(0.98); }
-  66% { transform: rotate(120deg) translate3d(2rem, -3rem, 0) scale(1.04); }
-  100% { transform: rotate(0deg) translate3d(0, 0, 0) scale(1.06); }
+.home-swirl-orb-four {
+  width: 38rem;
+  height: 38rem;
+  bottom: -12rem;
+  left: -8rem;
+  background: radial-gradient(circle at 50% 50%, #4a0e2a, #d4587a 70%, transparent 82%);
+  animation: home-swirl-morph-d 10s ease-in-out infinite;
+}
+
+.home-swirl-orb-five {
+  width: 30rem;
+  height: 30rem;
+  top: 40%;
+  left: -12rem;
+  background: radial-gradient(circle at 50% 50%, #fffaf7, #d4587a 70%, transparent 85%);
+  animation: home-swirl-morph-e 8s ease-in-out infinite;
+  opacity: 0.5;
+}
+
+@keyframes home-swirl-morph-a {
+  0%, 100% { border-radius: 42% 58% 64% 36% / 48% 34% 66% 52%; transform: translate3d(0,0,0) rotate(0deg) scale(1); }
+  33% { border-radius: 64% 36% 42% 58% / 36% 66% 34% 64%; transform: translate3d(3rem, 2rem, 0) rotate(60deg) scale(1.08); }
+  66% { border-radius: 36% 64% 58% 42% / 64% 48% 52% 36%; transform: translate3d(-2rem, 4rem, 0) rotate(-40deg) scale(0.95); }
+}
+
+@keyframes home-swirl-morph-b {
+  0%, 100% { border-radius: 58% 42% 36% 64% / 34% 66% 48% 52%; transform: translate3d(0,0,0) rotate(0deg) scale(1.05); }
+  50% { border-radius: 36% 64% 58% 42% / 66% 34% 52% 48%; transform: translate3d(-4rem, -3rem, 0) rotate(80deg) scale(0.92); }
+}
+
+@keyframes home-swirl-morph-c {
+  0%, 100% { border-radius: 50% 50% 36% 64% / 60% 40% 60% 40%; transform: translate3d(0,0,0) rotate(0deg) scale(1); }
+  40% { border-radius: 36% 64% 50% 50% / 40% 60% 40% 60%; transform: translate3d(-3rem, 3rem, 0) rotate(-70deg) scale(1.1); }
+  75% { border-radius: 64% 36% 64% 36% / 50% 50% 50% 50%; transform: translate3d(2rem, -2rem, 0) rotate(50deg) scale(0.96); }
+}
+
+@keyframes home-swirl-morph-d {
+  0%, 100% { border-radius: 64% 36% 58% 42% / 36% 64% 42% 58%; transform: translate3d(0,0,0) rotate(0deg) scale(1); }
+  50% { border-radius: 42% 58% 36% 64% / 58% 42% 64% 36%; transform: translate3d(4rem, -3rem, 0) rotate(-90deg) scale(1.08); }
+}
+
+@keyframes home-swirl-morph-e {
+  0%, 100% { border-radius: 50% 50% 50% 50%; transform: translate3d(0,0,0) rotate(0deg) scale(1); }
+  50% { border-radius: 30% 70% 70% 30% / 50% 30% 70% 50%; transform: translate3d(3rem, -2rem, 0) rotate(120deg) scale(1.12); }
 }
 
 @media (prefers-reduced-motion: reduce) {
