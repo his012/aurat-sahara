@@ -163,9 +163,8 @@
   --aurat-grad: linear-gradient(135deg, #a3206a 0%, #c2587a 55%, #e08ca8 100%);
   --aurat-grad-soft: linear-gradient(135deg, #fbeff5 0%, #f7e6ee 100%);
   --home-cream: oklch(0.985 0.012 75);
-  --home-burgundy: oklch(0.27 0.105 350);
-  --home-burgundy-soft: oklch(0.38 0.13 350);
-  --home-pink: oklch(0.94 0.035 350);
+  --home-swirl-pink: #fce4ec;
+  --home-swirl-cream: #fffaf7;
 }
 
 .home-brand-section {
@@ -173,61 +172,63 @@
 }
 
 .home-swirl {
-  background: linear-gradient(135deg, var(--home-burgundy), var(--home-burgundy-soft) 48%, var(--home-pink));
+  background: linear-gradient(135deg, var(--home-swirl-cream) 0%, var(--home-swirl-pink) 50%, var(--home-swirl-cream) 100%);
   isolation: isolate;
 }
 
 .home-swirl-orb {
   position: absolute;
   z-index: -1;
-  width: 55rem;
-  height: 55rem;
+  width: 60rem;
+  height: 60rem;
   border-radius: 42% 58% 64% 36% / 48% 34% 66% 52%;
-  filter: blur(72px);
-  opacity: 0.72;
+  filter: blur(90px);
+  opacity: 0.45;
   pointer-events: none;
   will-change: transform;
 }
 
 .home-swirl-orb-one {
-  top: -28rem;
-  left: -18rem;
+  top: -30rem;
+  left: -20rem;
   background: conic-gradient(
     from 40deg,
-    var(--home-burgundy-soft),
-    var(--home-pink),
-    var(--home-burgundy) 48%,
-    var(--home-burgundy-soft),
-    var(--home-pink) 82%,
-    var(--home-burgundy-soft)
+    var(--home-swirl-pink),
+    var(--home-swirl-cream),
+    var(--home-swirl-pink) 50%,
+    var(--home-swirl-cream),
+    var(--home-swirl-pink) 80%,
+    var(--home-swirl-cream)
   );
-  animation: home-swirl-clockwise 32s linear infinite;
+  animation: home-swirl-clockwise 20s linear infinite;
 }
 
 .home-swirl-orb-two {
-  right: -20rem;
-  bottom: -30rem;
+  right: -22rem;
+  bottom: -32rem;
   background: conic-gradient(
     from 180deg,
-    var(--home-burgundy),
-    var(--home-burgundy-soft) 28%,
-    var(--home-pink),
-    var(--home-burgundy-soft) 70%,
-    var(--home-burgundy)
+    var(--home-swirl-cream),
+    var(--home-swirl-pink) 30%,
+    var(--home-swirl-cream),
+    var(--home-swirl-pink) 70%,
+    var(--home-swirl-cream)
   );
-  animation: home-swirl-counter 38s linear infinite;
+  animation: home-swirl-counter 26s linear infinite;
 }
 
 @keyframes home-swirl-clockwise {
   0% { transform: rotate(0deg) translate3d(0, 0, 0) scale(1); }
-  50% { transform: rotate(180deg) translate3d(4rem, 2rem, 0) scale(1.08); }
+  33% { transform: rotate(120deg) translate3d(3rem, 2rem, 0) scale(1.06); }
+  66% { transform: rotate(240deg) translate3d(-2rem, 3rem, 0) scale(0.98); }
   100% { transform: rotate(360deg) translate3d(0, 0, 0) scale(1); }
 }
 
 @keyframes home-swirl-counter {
-  0% { transform: rotate(360deg) translate3d(0, 0, 0) scale(1.08); }
-  50% { transform: rotate(180deg) translate3d(-3rem, -2rem, 0) scale(0.95); }
-  100% { transform: rotate(0deg) translate3d(0, 0, 0) scale(1.08); }
+  0% { transform: rotate(360deg) translate3d(0, 0, 0) scale(1.06); }
+  33% { transform: rotate(240deg) translate3d(-3rem, -2rem, 0) scale(0.98); }
+  66% { transform: rotate(120deg) translate3d(2rem, -3rem, 0) scale(1.04); }
+  100% { transform: rotate(0deg) translate3d(0, 0, 0) scale(1.06); }
 }
 
 @media (prefers-reduced-motion: reduce) {
