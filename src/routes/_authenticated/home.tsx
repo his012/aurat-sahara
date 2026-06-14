@@ -66,6 +66,9 @@ function Home() {
       <section className="home-swirl relative flex flex-1 flex-col overflow-hidden px-6 py-6">
         <div className="home-swirl-orb home-swirl-orb-one" />
         <div className="home-swirl-orb home-swirl-orb-two" />
+        <div className="home-swirl-orb home-swirl-orb-three" />
+        <div className="home-swirl-orb home-swirl-orb-four" />
+        <div className="home-swirl-orb home-swirl-orb-five" />
 
         <div className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-6 py-8 text-center">
           <p
