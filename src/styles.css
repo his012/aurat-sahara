@@ -163,9 +163,8 @@
   --aurat-grad: linear-gradient(135deg, #a3206a 0%, #c2587a 55%, #e08ca8 100%);
   --aurat-grad-soft: linear-gradient(135deg, #fbeff5 0%, #f7e6ee 100%);
   --home-cream: oklch(0.985 0.012 75);
-  --home-burgundy: oklch(0.27 0.105 350);
-  --home-burgundy-soft: oklch(0.38 0.13 350);
-  --home-pink: oklch(0.94 0.035 350);
+  --home-swirl-pink: #fce4ec;
+  --home-swirl-cream: #fffaf7;
 }
 
 .home-brand-section {
@@ -173,18 +172,18 @@
 }
 
 .home-swirl {
-  background: linear-gradient(135deg, var(--home-burgundy), var(--home-burgundy-soft) 48%, var(--home-pink));
+  background: linear-gradient(135deg, var(--home-swirl-cream) 0%, var(--home-swirl-pink) 50%, var(--home-swirl-cream) 100%);
   isolation: isolate;
 }
 
 .home-swirl-orb {
   position: absolute;
   z-index: -1;
-  width: 55rem;
-  height: 55rem;
+  width: 60rem;
+  height: 60rem;
   border-radius: 42% 58% 64% 36% / 48% 34% 66% 52%;
-  filter: blur(72px);
-  opacity: 0.72;
+  filter: blur(90px);
+  opacity: 0.45;
   pointer-events: none;
   will-change: transform;
 }
