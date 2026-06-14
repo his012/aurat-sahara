@@ -53,15 +53,12 @@ function Home() {
             className="h-28 w-28 shrink-0 object-contain sm:h-36 sm:w-36"
           />
           <div className={rtl ? "text-right" : "text-left"}>
-            <h1 className="aurat-display text-3xl font-bold text-primary sm:text-4xl">
+            <h1
+              className="aurat-display text-3xl font-bold sm:text-4xl"
+              style={{ color: "#c2185b" }}
+            >
               Aurat Sahara
             </h1>
-            <p
-              className="mt-2 max-w-md text-sm leading-relaxed text-foreground/70 sm:text-base"
-              style={fontStyle}
-            >
-              {HOME_TAGLINES[lang]}
-            </p>
           </div>
         </div>
       </section>
@@ -70,7 +67,14 @@ function Home() {
         <div className="home-swirl-orb home-swirl-orb-one" />
         <div className="home-swirl-orb home-swirl-orb-two" />
 
-        <div className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center py-8 text-center">
+        <div className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-6 py-8 text-center">
+          <p
+            className="max-w-md text-sm leading-relaxed text-foreground/80 sm:text-base"
+            style={fontStyle}
+          >
+            {HOME_TAGLINES[lang]}
+          </p>
+
           <button
             onClick={() => setIsModalOpen(true)}
             className="aurat-btn flex w-full items-center justify-center gap-2 rounded-full px-8 text-lg font-semibold"
@@ -81,7 +85,7 @@ function Home() {
           </button>
         </div>
 
-        <p className="relative z-10 mt-auto text-center text-xs text-primary-foreground/80">
+        <p className="relative z-10 mt-auto text-center text-xs text-foreground/60">
           Maham Lodhi &amp; Farhan Shoukat
         </p>
       </section>
