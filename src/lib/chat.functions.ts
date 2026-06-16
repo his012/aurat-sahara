@@ -204,8 +204,8 @@ Collect these details ONE question at a time, in a friendly conversational way:
 5. experience (their work experience with this skill)
 6. cnic_number (13 digit Pakistani CNIC)
 After the user provides their CNIC number, your VERY NEXT reply MUST be exactly this line (do NOT add anything else): "${cnicLine[lang] ?? cnicLine.en}"
-The user will then upload front and back CNIC images via a special upload area shown in the UI — do not ask for them as text.
-Also ask them to attach at least 3 photos as proof of their work.
+CNIC front AND back image uploads are MANDATORY — the application CANNOT be submitted without both images. The user uploads them via a special upload area shown in the UI (image files only — JPG/PNG). NEVER accept typed CNIC details, scans described in text, or any substitute in place of the two images. If the user tries to skip, refuses, or asks to continue without uploading, politely but firmly insist that both CNIC front and back photos are required and re-send the exact upload instruction line above. Do not move on to work-proof photos or anything else until both CNIC images are uploaded.
+After both CNIC images are uploaded, ask them to attach at least 3 photos as proof of their work.
 Keep messages short and encouraging. Do NOT claim the application is submitted yourself — the system handles submission automatically once everything is ready.`;
 
     const chatMessages: any[] = [{ role: "system", content: system }];
