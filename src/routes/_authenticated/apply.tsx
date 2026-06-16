@@ -132,6 +132,27 @@ function Apply() {
     setPreviews((prev) => prev.filter((_, i) => i !== idx));
   };
 
+  const uploadCnic = async (side: "front" | "back", file: File) => {
+    if (!userId) {
+      toast.error(tr.signInAgain);
+      return;
+    }
+    setCnicUploading(side);
+    try {
+      const path = `${userId}/cnic-${side}-${Date.now()}-${Math.random().toString(36).slice(2)}-${file.name}`;
+      const { error } = await supabase.storage.from("portfolio-images").upload(path, file);
+      if (error) {
+        toast.error(tr.uploadFailed);
+        return;
+      }
+      const entry = { path, preview: URL.createObjectURL(file) };
+      if (side === "front") setCnicFront(entry);
+      else setCnicBack(entry);
+    } finally {
+      setCnicUploading(null);
+    }
+  };
+
   const startListening = async () => {
     const SR =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -181,11 +202,18 @@ function Apply() {
     c.experience != null &&
     c.cnic_number != null;
 
+  const cnicImageUrls = useMemo(
+    () => [cnicFront?.path, cnicBack?.path].filter(Boolean) as string[],
+    [cnicFront, cnicBack],
+  );
+  const bothCnicUploaded = !!cnicFront && !!cnicBack;
+
   const finalizeSubmission = async (history: ChatMsg[]) => {
     const res = await callGrok({
       data: {
         messages: history.map((m) => ({ role: m.role, content: m.content })),
         image_urls: uploadedImageUrls,
+        cnic_image_urls: cnicImageUrls,
         forceSubmit: true,
         lang,
       },
@@ -217,11 +245,13 @@ function Apply() {
     try {
       const history = nextMessages.map((m) => ({ role: m.role, content: m.content }));
       const res = await callGrok({
-        data: { messages: history, image_urls: uploadedImageUrls, lang },
+        data: { messages: history, image_urls: uploadedImageUrls, cnic_image_urls: cnicImageUrls, lang },
       });
 
       const replyMsg: ChatMsg = { role: "assistant", content: res.reply };
       setMessages((prev) => [...prev, replyMsg]);
+
+      if (res.collected?.cnic_number) setCnicRequested(true);
 
       if (res.applicationSubmitted) {
         setSubmitted(true);
@@ -229,7 +259,11 @@ function Apply() {
         return;
       }
 
-      if (uploadedImageUrls.length >= 3 && isComplete(res.collected)) {
+      if (
+        uploadedImageUrls.length >= 3 &&
+        bothCnicUploaded &&
+        isComplete(res.collected)
+      ) {
         await finalizeSubmission([...nextMessages, replyMsg]);
       }
     } catch {
