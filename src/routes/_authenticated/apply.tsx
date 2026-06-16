@@ -137,6 +137,10 @@ function Apply() {
       toast.error(tr.signInAgain);
       return;
     }
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file (JPG or PNG) only.");
+      return;
+    }
     setCnicUploading(side);
     try {
       const path = `${userId}/cnic-${side}-${Date.now()}-${Math.random().toString(36).slice(2)}-${file.name}`;
