@@ -34,6 +34,12 @@ const GREETING: Record<string, string> = {
   en: "Salam! I am Aurat Sahara AI. What skill would you like a certificate for?",
 };
 
+const CNIC_LABELS: Record<string, { front: string; back: string; heading: string }> = {
+  ur: { front: "CNIC سامنے", back: "CNIC پیچھے", heading: "اپنا شناختی کارڈ اپلوڈ کریں" },
+  roman: { front: "CNIC Front", back: "CNIC Back", heading: "Apna CNIC upload karein" },
+  en: { front: "CNIC Front", back: "CNIC Back", heading: "Upload your CNIC" },
+};
+
 function Apply() {
   const navigate = useNavigate();
   const lang = useMemo(getLang, []);
@@ -49,6 +55,10 @@ function Apply() {
   const [input, setInput] = useState("");
   const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [cnicFront, setCnicFront] = useState<{ path: string; preview: string } | null>(null);
+  const [cnicBack, setCnicBack] = useState<{ path: string; preview: string } | null>(null);
+  const [cnicUploading, setCnicUploading] = useState<"front" | "back" | null>(null);
+  const [cnicRequested, setCnicRequested] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [sending, setSending] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -56,6 +66,8 @@ function Apply() {
   const [micAvailable, setMicAvailable] = useState(false);
 
   const fileRef = useRef<HTMLInputElement>(null);
+  const cnicFrontRef = useRef<HTMLInputElement>(null);
+  const cnicBackRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
