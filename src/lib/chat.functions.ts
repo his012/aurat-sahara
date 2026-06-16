@@ -6,6 +6,7 @@ type ChatMessage = { role: "user" | "assistant"; content: string };
 type GrokInput = {
   messages: ChatMessage[];
   image_urls?: string[];
+  cnic_image_urls?: string[];
   forceSubmit?: boolean;
   lang?: string;
 };
@@ -161,6 +162,7 @@ export const grokChat = createServerFn({ method: "POST" })
         experience: collected.experience,
         cnic_number: collected.cnic_number,
         work_proof_urls: imageUrls,
+        cnic_image_urls: data.cnic_image_urls ?? [],
         status: "pending",
       });
 
@@ -187,6 +189,11 @@ export const grokChat = createServerFn({ method: "POST" })
     }
 
     // ---- Normal conversational path ----
+    const cnicLine: Record<string, string> = {
+      ur: "شکریہ! اب براہِ کرم اپنے شناختی کارڈ (CNIC) کے دونوں طرف کی تصاویر اپلوڈ کریں — سامنے اور پیچھے۔",
+      roman: "Shukriya! Ab please apne CNIC ki dono sides upload karein — front aur back.",
+      en: "Thank you! Now please upload both sides of your CNIC — front and back.",
+    };
     const system = `You are "Aurat Sahara AI", a warm, respectful assistant that helps women in Pakistan apply for a skill certificate.
 ${LANG_INSTRUCTION[lang] ?? LANG_INSTRUCTION.en}
 Collect these details ONE question at a time, in a friendly conversational way:
@@ -196,6 +203,8 @@ Collect these details ONE question at a time, in a friendly conversational way:
 4. education
 5. experience (their work experience with this skill)
 6. cnic_number (13 digit Pakistani CNIC)
+After the user provides their CNIC number, your VERY NEXT reply MUST be exactly this line (do NOT add anything else): "${cnicLine[lang] ?? cnicLine.en}"
+The user will then upload front and back CNIC images via a special upload area shown in the UI — do not ask for them as text.
 Also ask them to attach at least 3 photos as proof of their work.
 Keep messages short and encouraging. Do NOT claim the application is submitted yourself — the system handles submission automatically once everything is ready.`;
 

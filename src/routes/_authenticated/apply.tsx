@@ -34,6 +34,12 @@ const GREETING: Record<string, string> = {
   en: "Salam! I am Aurat Sahara AI. What skill would you like a certificate for?",
 };
 
+const CNIC_LABELS: Record<string, { front: string; back: string; heading: string }> = {
+  ur: { front: "CNIC سامنے", back: "CNIC پیچھے", heading: "اپنا شناختی کارڈ اپلوڈ کریں" },
+  roman: { front: "CNIC Front", back: "CNIC Back", heading: "Apna CNIC upload karein" },
+  en: { front: "CNIC Front", back: "CNIC Back", heading: "Upload your CNIC" },
+};
+
 function Apply() {
   const navigate = useNavigate();
   const lang = useMemo(getLang, []);
@@ -49,6 +55,10 @@ function Apply() {
   const [input, setInput] = useState("");
   const [uploadedImageUrls, setUploadedImageUrls] = useState<string[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [cnicFront, setCnicFront] = useState<{ path: string; preview: string } | null>(null);
+  const [cnicBack, setCnicBack] = useState<{ path: string; preview: string } | null>(null);
+  const [cnicUploading, setCnicUploading] = useState<"front" | "back" | null>(null);
+  const [cnicRequested, setCnicRequested] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [sending, setSending] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -56,6 +66,8 @@ function Apply() {
   const [micAvailable, setMicAvailable] = useState(false);
 
   const fileRef = useRef<HTMLInputElement>(null);
+  const cnicFrontRef = useRef<HTMLInputElement>(null);
+  const cnicBackRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -120,6 +132,27 @@ function Apply() {
     setPreviews((prev) => prev.filter((_, i) => i !== idx));
   };
 
+  const uploadCnic = async (side: "front" | "back", file: File) => {
+    if (!userId) {
+      toast.error(tr.signInAgain);
+      return;
+    }
+    setCnicUploading(side);
+    try {
+      const path = `${userId}/cnic-${side}-${Date.now()}-${Math.random().toString(36).slice(2)}-${file.name}`;
+      const { error } = await supabase.storage.from("portfolio-images").upload(path, file);
+      if (error) {
+        toast.error(tr.uploadFailed);
+        return;
+      }
+      const entry = { path, preview: URL.createObjectURL(file) };
+      if (side === "front") setCnicFront(entry);
+      else setCnicBack(entry);
+    } finally {
+      setCnicUploading(null);
+    }
+  };
+
   const startListening = async () => {
     const SR =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -169,11 +202,18 @@ function Apply() {
     c.experience != null &&
     c.cnic_number != null;
 
+  const cnicImageUrls = useMemo(
+    () => [cnicFront?.path, cnicBack?.path].filter(Boolean) as string[],
+    [cnicFront, cnicBack],
+  );
+  const bothCnicUploaded = !!cnicFront && !!cnicBack;
+
   const finalizeSubmission = async (history: ChatMsg[]) => {
     const res = await callGrok({
       data: {
         messages: history.map((m) => ({ role: m.role, content: m.content })),
         image_urls: uploadedImageUrls,
+        cnic_image_urls: cnicImageUrls,
         forceSubmit: true,
         lang,
       },
@@ -205,11 +245,13 @@ function Apply() {
     try {
       const history = nextMessages.map((m) => ({ role: m.role, content: m.content }));
       const res = await callGrok({
-        data: { messages: history, image_urls: uploadedImageUrls, lang },
+        data: { messages: history, image_urls: uploadedImageUrls, cnic_image_urls: cnicImageUrls, lang },
       });
 
       const replyMsg: ChatMsg = { role: "assistant", content: res.reply };
       setMessages((prev) => [...prev, replyMsg]);
+
+      if (res.collected?.cnic_number) setCnicRequested(true);
 
       if (res.applicationSubmitted) {
         setSubmitted(true);
@@ -217,7 +259,11 @@ function Apply() {
         return;
       }
 
-      if (uploadedImageUrls.length >= 3 && isComplete(res.collected)) {
+      if (
+        uploadedImageUrls.length >= 3 &&
+        bothCnicUploaded &&
+        isComplete(res.collected)
+      ) {
         await finalizeSubmission([...nextMessages, replyMsg]);
       }
     } catch {
@@ -376,6 +422,66 @@ function Apply() {
                 >
                   <CheckCircle2 size={18} />
                   {tr.submittedSuccess}
+                </div>
+              )}
+
+              {cnicRequested && !submitted && (!cnicFront || !cnicBack) && (
+                <div
+                  className="mx-4 mb-2 rounded-2xl border p-4"
+                  style={{ borderColor: "#F0C9DD", backgroundColor: "#FFF7FB" }}
+                >
+                  <p className="mb-3 text-sm font-semibold" style={{ color: "#8B2252", ...fontStyle }}>
+                    {(CNIC_LABELS[lang] ?? CNIC_LABELS.en).heading}
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {(["front", "back"] as const).map((side) => {
+                      const slot = side === "front" ? cnicFront : cnicBack;
+                      const ref = side === "front" ? cnicFrontRef : cnicBackRef;
+                      const label = (CNIC_LABELS[lang] ?? CNIC_LABELS.en)[side];
+                      return (
+                        <div key={side}>
+                          <input
+                            ref={ref}
+                            type="file"
+                            accept="image/*"
+                            hidden
+                            onChange={(e) => {
+                              const f = e.target.files?.[0];
+                              if (ref.current) ref.current.value = "";
+                              if (f) uploadCnic(side, f);
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => ref.current?.click()}
+                            disabled={cnicUploading === side}
+                            className="flex h-28 w-full flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed bg-white text-xs font-medium transition hover:bg-[#FBEFF5] disabled:opacity-50"
+                            style={{ borderColor: slot ? "#27AE60" : "#D4A0B8", color: "#8B2252", ...fontStyle }}
+                          >
+                            {slot ? (
+                              <img src={slot.preview} alt={label} className="h-full w-full object-cover" />
+                            ) : (
+                              <>
+                                <Paperclip size={20} />
+                                <span className="mt-1">{label}</span>
+                                {cnicUploading === side && <span className="text-[10px]">{tr.uploading}</span>}
+                              </>
+                            )}
+                          </button>
+                          {slot && (
+                            <button
+                              type="button"
+                              onClick={() => (side === "front" ? setCnicFront(null) : setCnicBack(null))}
+                              className="mt-1 text-[11px] underline"
+                              style={{ color: "#C0392B" }}
+                            >
+                              ✕ {label}
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
 

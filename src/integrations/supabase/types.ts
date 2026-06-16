@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           age: number | null
           city: string | null
+          cnic_image_urls: string[]
           cnic_number: string | null
           comment: string | null
           created_at: string
@@ -34,6 +35,7 @@ export type Database = {
         Insert: {
           age?: number | null
           city?: string | null
+          cnic_image_urls?: string[]
           cnic_number?: string | null
           comment?: string | null
           created_at?: string
@@ -50,6 +52,7 @@ export type Database = {
         Update: {
           age?: number | null
           city?: string | null
+          cnic_image_urls?: string[]
           cnic_number?: string | null
           comment?: string | null
           created_at?: string
