@@ -199,6 +199,31 @@ function Admin() {
                       </div>
                     )}
 
+                    {r.cnic_thumb_urls && r.cnic_thumb_urls.length > 0 && (
+                      <div className="mt-5">
+                        <p className="mb-2 text-sm font-semibold" style={{ color: "#8B2252" }}>
+                          CNIC Images ({r.cnic_thumb_urls.length})
+                        </p>
+                        <div className="flex flex-wrap gap-3">
+                          {r.cnic_thumb_urls.map((url, i) => (
+                            <a key={i} href={url} target="_blank" rel="noreferrer">
+                              <div className="flex flex-col items-center gap-1">
+                                <img
+                                  src={url}
+                                  alt={i === 0 ? "CNIC front" : "CNIC back"}
+                                  className="h-40 w-64 rounded-lg border object-cover"
+                                  style={{ borderColor: "#F0C9DD" }}
+                                />
+                                <span className="text-xs" style={{ color: "#9B8794" }}>
+                                  {i === 0 ? "Front" : "Back"}
+                                </span>
+                              </div>
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {r.comment && r.status === "declined" && (
                       <p className="mt-4 rounded-lg px-3 py-2 text-sm" style={{ backgroundColor: "#FBEAEA", color: "#B33B3B" }}>
                         Decline reason: {r.comment}

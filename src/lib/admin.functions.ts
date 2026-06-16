@@ -13,6 +13,8 @@ export type AdminRequest = {
   status: "pending" | "approved" | "declined";
   work_proof_urls: string[];
   thumb_urls: string[];
+  cnic_image_urls: string[];
+  cnic_thumb_urls: string[];
   comment: string | null;
   created_at: string;
 };
@@ -28,16 +30,22 @@ export const getAllRequests = createServerFn({ method: "GET" }).handler(
 
     if (error || !data) return [];
 
-    const result: AdminRequest[] = [];
-    for (const row of data) {
-      const thumbs: string[] = [];
-      for (const path of row.work_proof_urls ?? []) {
+    const signPaths = async (paths: string[]): Promise<string[]> => {
+      const out: string[] = [];
+      for (const path of paths ?? []) {
         const { data: signed } = await supabaseAdmin.storage
           .from("portfolio-images")
           .createSignedUrl(path, 60 * 60);
-        if (signed?.signedUrl) thumbs.push(signed.signedUrl);
+        if (signed?.signedUrl) out.push(signed.signedUrl);
       }
-      result.push({ ...(row as any), thumb_urls: thumbs });
+      return out;
+    };
+
+    const result: AdminRequest[] = [];
+    for (const row of data) {
+      const thumbs = await signPaths(row.work_proof_urls ?? []);
+      const cnicThumbs = await signPaths((row as any).cnic_image_urls ?? []);
+      result.push({ ...(row as any), thumb_urls: thumbs, cnic_thumb_urls: cnicThumbs });
     }
     return result;
   },
