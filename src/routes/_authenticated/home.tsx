@@ -6,6 +6,7 @@ import { getLang, isRtl, t } from "@/lib/i18n";
 import { getPrivacyTerms } from "@/lib/privacy-terms";
 import { Dialog, DialogPortal, DialogOverlay, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import mark from "@/assets/mark.png";
+import FloatingLinesBackground from "@/components/FloatingLinesBackground";
 
 const HOME_TAGLINES = {
   en: "Empowering Pakistani women by recognizing their skills and connecting them to official certification pathways.",
