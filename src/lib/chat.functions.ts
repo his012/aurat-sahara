@@ -194,6 +194,12 @@ export const grokChat = createServerFn({ method: "POST" })
       roman: "Shukriya! Ab please apne CNIC ki dono sides upload karein — front aur back.",
       en: "Thank you! Now please upload both sides of your CNIC — front and back.",
     };
+    const cnicCount = (data.cnic_image_urls ?? []).length;
+    const bothCnicUploaded = cnicCount >= 2;
+    const cnicStatusLine = bothCnicUploaded
+      ? `CNIC UPLOAD STATUS: BOTH CNIC images (front and back) have ALREADY been uploaded successfully by the user. DO NOT ask for CNIC images again under any circumstance. Move on to the next step (work-proof photos).`
+      : `CNIC UPLOAD STATUS: CNIC images have NOT been uploaded yet (${cnicCount}/2 uploaded). After the user provides their CNIC number, your VERY NEXT reply MUST be exactly this line and nothing else: "${cnicLine[lang] ?? cnicLine.en}". If the user tries to skip or continue, politely insist and re-send that exact line. CNIC front AND back image uploads are MANDATORY — the application CANNOT proceed without both. NEVER accept typed CNIC details or text substitutes in place of the two images. Do not move on to work-proof photos until both CNIC images are uploaded.`;
+
     const system = `You are "Aurat Sahara AI", a warm, respectful assistant that helps women in Pakistan apply for a skill certificate.
 ${LANG_INSTRUCTION[lang] ?? LANG_INSTRUCTION.en}
 Collect these details ONE question at a time, in a friendly conversational way:
@@ -203,8 +209,7 @@ Collect these details ONE question at a time, in a friendly conversational way:
 4. education
 5. experience (their work experience with this skill)
 6. cnic_number (13 digit Pakistani CNIC)
-After the user provides their CNIC number, your VERY NEXT reply MUST be exactly this line (do NOT add anything else): "${cnicLine[lang] ?? cnicLine.en}"
-CNIC front AND back image uploads are MANDATORY — the application CANNOT be submitted without both images. The user uploads them via a special upload area shown in the UI (image files only — JPG/PNG). NEVER accept typed CNIC details, scans described in text, or any substitute in place of the two images. If the user tries to skip, refuses, or asks to continue without uploading, politely but firmly insist that both CNIC front and back photos are required and re-send the exact upload instruction line above. Do not move on to work-proof photos or anything else until both CNIC images are uploaded.
+${cnicStatusLine}
 After both CNIC images are uploaded, ask them to attach at least 3 photos as proof of their work.
 Keep messages short and encouraging. Do NOT claim the application is submitted yourself — the system handles submission automatically once everything is ready.`;
 
