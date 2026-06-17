@@ -86,6 +86,32 @@ function Apply() {
     setMicAvailable(supported);
   }, []);
 
+  // When both CNIC images are uploaded, send a one-time acknowledgment so the
+  // AI knows and stops re-asking for them.
+  useEffect(() => {
+    if (!bothCnicUploaded || cnicAckSentRef.current || sending || submitted) return;
+    cnicAckSentRef.current = true;
+    void (async () => {
+      const ackText = CNIC_ACK[lang] ?? CNIC_ACK.en;
+      const userMsg: ChatMsg = { role: "user", content: ackText };
+      const nextMessages = [...messages, userMsg];
+      setMessages(nextMessages);
+      setSending(true);
+      try {
+        const history = nextMessages.map((m) => ({ role: m.role, content: m.content }));
+        const res = await callGrok({
+          data: { messages: history, image_urls: uploadedImageUrls, cnic_image_urls: cnicImageUrls, lang },
+        });
+        setMessages((prev) => [...prev, { role: "assistant", content: res.reply }]);
+      } catch {
+        setMessages((prev) => [...prev, { role: "assistant", content: tr.somethingWrong }]);
+      } finally {
+        setSending(false);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bothCnicUploaded]);
+
   const { data: apps = [], refetch } = useQuery({
     queryKey: ["my-applications", userId],
     enabled: !!userId,
