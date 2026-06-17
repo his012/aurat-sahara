@@ -75,7 +75,7 @@ function Home() {
 
         <div className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-6 py-8 text-center">
           <p
-            className="max-w-md text-sm leading-relaxed text-foreground/80 sm:text-base"
+            className="max-w-md text-sm leading-relaxed text-[#fffaf7] sm:text-base"
             style={fontStyle}
           >
             {HOME_TAGLINES[lang]}
