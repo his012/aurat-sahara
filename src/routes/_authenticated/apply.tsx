@@ -211,6 +211,13 @@ function Apply() {
     [cnicFront, cnicBack],
   );
   const bothCnicUploaded = !!cnicFront && !!cnicBack;
+  const cnicAckSentRef = useRef(false);
+
+  const CNIC_ACK: Record<string, string> = {
+    ur: "میں نے اپنے شناختی کارڈ کی دونوں تصاویر (سامنے اور پیچھے) اپلوڈ کر دی ہیں۔",
+    roman: "Maine apne CNIC ki dono tasveerein (front aur back) upload kar di hain.",
+    en: "I have uploaded both sides of my CNIC (front and back).",
+  };
 
   const finalizeSubmission = async (history: ChatMsg[]) => {
     const res = await callGrok({
